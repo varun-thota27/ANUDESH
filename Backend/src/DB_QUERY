@@ -1,0 +1,93 @@
+CREATE TABLE employees (
+    command TEXT,
+    gpf_pran TEXT PRIMARY KEY UNIQUE NOT NULL,
+    directorate TEXT,
+    army_no TEXT UNIQUE,
+    group TEXT,
+    designation TEXT,
+    faculty TEXT,
+    first_name TEXT,
+    middle_name TEXT,
+    last_name TEXT,
+    gender TEXT,
+    category TEXT,
+    religion TEXT,
+    date_of_birth DATE,
+    date_of_appointment DATE,
+    date_of_retirement DATE,
+    mode_of_appointment TEXT,
+    fr56j TEXT,
+    employee_group TEXT,
+    ind TEXT,
+    education TEXT,
+    blood_group TEXT,
+    cat TEXT,
+    pan_number TEXT,
+    identification_marks TEXT,
+    police_verification_no TEXT,
+    police_verification_date DATE,
+    marriage_do_ptii TEXT,
+    kindred_roll_do_ptii TEXT,
+    bank_account_number TEXT,
+    bank_name TEXT,
+    ifsc_code TEXT,
+    court_case BOOLEAN DEFAULT FALSE,
+    court_name TEXT,
+    audit_ BOOLEAN DEFAULT FALSE,
+    date_of_audit DATE,
+    penalty BOOLEAN DEFAULT FALSE,
+    penalty_remarks TEXT,
+    mobile_no TEXT,
+    email_id TEXT UNIQUE,
+    uid_no TEXT UNIQUE,
+    macp TEXT,
+    promotion BOOLEAN DEFAULT FALSE,
+    permanent_address TEXT,
+    temporary_address TEXT,
+    discp_cases BOOLEAN DEFAULT FALSE,
+    discp_remarks TEXT,
+    probation_period BOOLEAN DEFAULT FALSE,
+    confirmed_date DATE,
+    ltc_ta_da TEXT,
+    toa_sos_in_mceme TEXT,
+    pay_level TEXT,
+    basic_pay DECIMAL(10,2)
+);
+CREATE TABLE promotions (
+    gpf_pran TEXT REFERENCES employees(gpf_pran) ON DELETE CASCADE,
+    name TEXT,
+    date DATE
+);
+CREATE TABLE postings (
+    gpf_pran TEXT REFERENCES employees(gpf_pran) ON DELETE CASCADE,
+    unit TEXT,
+    from_date DATE,
+    to_date DATE
+);
+CREATE TABLE probations (
+    gpf_pran TEXT REFERENCES employees(gpf_pran) ON DELETE CASCADE,
+    year TEXT,
+    date DATE
+);
+CREATE TABLE family_members (
+    gpf_pran TEXT REFERENCES employees(gpf_pran) ON DELETE CASCADE,
+    name TEXT,
+    dob DATE,
+    relationship TEXT,
+    category TEXT,
+    remarks TEXT
+);
+
+CREATE TABLE leave_history (
+    army_no TEXT REFERENCES employees(army_no) ON DELETE CASCADE ON UPDATE CASCADE,
+    leave_type VARCHAR(255),
+    name TEXT,
+    from_date DATE,
+    to_date DATE,
+    status TEXT,
+    no_of_days INT,
+    reason_for_leave TEXT,
+    address_on_leave TEXT,
+    reccomendation TEXT,
+    section_officer TEXT
+);
