@@ -13,7 +13,7 @@ const attendanceController = {
       let result;
 
       if (role === 'admin') {
-        result = await pool.query("SELECT wing FROM faculty_wing");
+        result = await pool.query("SELECT dept_name as wing FROM department");
       } else {
         result = await pool.query("SELECT wing FROM faculty_wing WHERE faculty = $1", [faculty]);
       }
