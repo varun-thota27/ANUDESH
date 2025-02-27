@@ -345,30 +345,25 @@ const Registration = () => {
         }
       };
 
-    const handleretir = (e) => {
+      const handleretir = (e) => {
         const { name, value } = e.target;
         let updatedFormData = { ...formData, [name]: value };
     
-        // If date of appointment or date of birth is selected, calculate retirement date
-        if (name === "dateOfAppointment" || name === "dateOfBirth") {
-            if (updatedFormData.dateOfAppointment && updatedFormData.dateOfBirth) {
+        // If date of birth is selected, calculate retirement date
+        if (name === "dateOfBirth") {
+            if (updatedFormData.dateOfBirth) {
                 let birthDate = new Date(updatedFormData.dateOfBirth);
-                let appointmentDate = new Date(updatedFormData.dateOfAppointment);
-    
-                // Set retirement year to birth year + 60, but keep appointment's month and day
-                let retirementYear = birthDate.getFullYear() + 60;
-                let retirementDate = new Date(appointmentDate);
-                retirementDate.setFullYear(retirementYear);
+                let retirementDate = new Date(birthDate);
+                retirementDate.setFullYear(birthDate.getFullYear() + 60);
     
                 updatedFormData.dateOfRetirement = retirementDate.toISOString().split('T')[0]; // Format YYYY-MM-DD
             } else {
-                // If either field is missing, clear retirement date
                 updatedFormData.dateOfRetirement = "";
             }
         }
     
         setFormData(updatedFormData);
-    };
+    };    
 
     return (
         <div>
@@ -515,10 +510,6 @@ const Registration = () => {
                             <label>Date of Retirement</label>
                             <input type="date" name="dateOfRetirement" value={formData.dateOfRetirement} readOnly />
                         </div>
-                        {/* <div className="form-group">
-                            <label>Date of Retirement</label>
-                            <input type="date" name="dateOfRetirement" value={formData.dateOfRetirement} onChange={handleChange} />
-                        </div> */}
                     </div>
 
                     {/* New Personal Details */}
