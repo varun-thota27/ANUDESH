@@ -92,7 +92,7 @@ FROM attendance a LEFT JOIN employees e ON e.army_no = a.army_no where DATE(a.ti
         const queries = members.map(async (row) => {
             // Fetch all leave records if the person is on approved leave
             const leaveRecords = await pool.query(
-                `SELECT leave_id, from_date, to_date FROM leave_history 
+                `SELECT leave_id, from_date, to_date,leave_type FROM leave_history 
                  WHERE army_no = $1 
                  AND CURRENT_DATE BETWEEN from_date AND to_date
                  AND status = 'APPROVED'`, 
@@ -110,14 +110,59 @@ FROM attendance a LEFT JOIN employees e ON e.army_no = a.army_no where DATE(a.ti
             if (row.status === "Present" && leaveRecords.rows.length > 0) {
                 // Process each leave record separately
                 for (const leave of leaveRecords.rows) {
-                    if (leave.to_date > leave.from_date) {
-                        await pool.query(
-                            `UPDATE leave_history 
-                             SET to_date = CURRENT_DATE - INTERVAL '1 day' 
-                             WHERE leave_id = $1`, 
-                            [leave.leave_id]
+                  if (leave.to_date > leave.from_date) {
+                    //  First Query - Update leave status
+                    const client = await pool.connect();
+                    try {
+                      await client.query("BEGIN"); // Start transaction
+                  
+                      await client.query(
+                        `UPDATE leave_history 
+                         SET to_date = CURRENT_DATE - INTERVAL '1 day',
+                             status = 'PENDING' 
+                         WHERE leave_id = $1`, 
+                        [leave.leave_id]
+                      );
+                  
+                      //  Second Query - Update no_of_days only if leave type is not 'RH' or 'CL'
+                      if (leave.leave_type !== 'RH' && leave.leave_type !== 'CL') {
+                        const fromDate = new Date(leave.from_date);
+                  
+                        // Properly fetch `to_date` from the database
+                        const result = await client.query(
+                          `SELECT to_date FROM leave_history WHERE leave_id = $1`, 
+                          [leave.leave_id]
                         );
+                  
+                        if (result.rows.length === 0 || !result.rows[0].to_date) {
+                          throw new Error("No valid to_date found for the given leave_id.");
+                        }
+                  
+                        const toDate = new Date(result.rows[0].to_date);
+                  
+                        if (isNaN(fromDate) || isNaN(toDate)) {
+                          throw new Error("Invalid dates provided.");
+                        }
+                  
+                        const days = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
+                  
+                        await client.query(
+                          `UPDATE leave_history 
+                           SET no_of_days = $2
+                           WHERE leave_id = $1`,
+                          [leave.leave_id, days] 
+                        );
+                      } 
+                  
+                      await client.query("COMMIT"); //  Commit transaction
+                    } catch (error) {
+                      await client.query("ROLLBACK"); 
+                      console.error("Transaction failed:", error);
+                    } finally {
+                      client.release(); 
                     }
+                  }
+                                  
 
                     // Re-fetch updated leave record
                     const updatedLeave = await pool.query(
@@ -137,6 +182,7 @@ FROM attendance a LEFT JOIN employees e ON e.army_no = a.army_no where DATE(a.ti
             } else if (row.status === "Leave") {
                 // If status is "Absent" or any type of leave, increment leave count using leave_id
                 for (const leave of leaveRecords.rows) {
+                  if(leave.leave_type === 'RH' || leave.leave_type === 'CL')
                     await pool.query(
                         `UPDATE leave_history 
                          SET no_of_days = no_of_days + 1 
@@ -156,7 +202,7 @@ FROM attendance a LEFT JOIN employees e ON e.army_no = a.army_no where DATE(a.ti
                     status = EXCLUDED.status, 
                     remarks = EXCLUDED.remarks, 
                     timestamp = EXCLUDED.timestamp`,
-                [row.armyNo, faculty, row.status || "None", `on ${row.status} leave`, timestamp]
+                [row.armyNo, faculty, row.status || "None", ` ${row.status} `, timestamp]
             );
         });
 

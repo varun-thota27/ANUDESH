@@ -55,7 +55,7 @@ const leaveController = {
         const fromDate = new Date(formData.fromDate);
         const toDate = new Date(formData.toDate);
 
-        // **Handling "Extension of Leave"**
+        // Handling Extension of Leave
         if (formData.leaveType === "Extension of Leave") {
             const latestLeaveQuery = `
                 SELECT leave_type FROM leave_history 
@@ -68,34 +68,75 @@ const leaveController = {
 
             if (rows.length > 0) {
                 const latestLeaveType = rows[0].leave_type; // Fetch latest leave type
-
-                // **Split Extension if it spans two years**
+                // Split Extension if it spans two years
                 if (fromDate.getFullYear() !== toDate.getFullYear()) {
                     const endOfYear = new Date(fromDate.getFullYear(), 11, 31); // Dec 31 of start year
                     const startOfNextYear = new Date(toDate.getFullYear(), 0, 1); // Jan 1 of next year
 
+                    const absentResult = await pool.query(
+                      `SELECT COUNT(*) AS absent_count
+                       FROM absent
+                       WHERE army_no = $1 AND date BETWEEN $2 AND CURRENT_DATE`,
+                      [armyNo, fromDate]
+                  );
+                  
+                  // Extract count and ensure a default value of 0 if no records are found
+                  const absentCount = absentResult.rows.length > 0 ? parseInt(absentResult.rows[0].absent_count) : 0;
+                  
+                  const days1 = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
+                      ? absentCount
+                      : (Math.ceil((endOfYear - fromDate) / (1000 * 60 * 60 * 24)) + 1);
+                  
                     await pool.query(
                         `INSERT INTO leave_history 
                         (army_no, leave_type, from_date, to_date, status, no_of_days, reason_for_leave, 
                         address_on_leave, recommendation, section_officer, recommendation_date, is_extended)
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_DATE, $11)`,
-                        [armyNo, latestLeaveType, formData.fromDate, endOfYear, 'PENDING', 0,
+                        [armyNo, latestLeaveType, formData.fromDate, endOfYear, 'PENDING', days1,
                         formData.reason, formData.address, formData.recommendation, formData.sectionOfficerName, true]
                     );
+
+                    absentResult = await pool.query(
+                      `SELECT COUNT(*) AS absent_count
+                       FROM absent
+                       WHERE army_no = $1 AND date BETWEEN $2 AND CURRENT_DATE`,
+                      [armyNo, startOfNextYear]
+                  );
+                  absentCount = absentResult.rows.length > 0 ? parseInt(absentResult.rows[0].absent_count) : 0;
+                  const days2 = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
+                  ? absentCount
+                  : (Math.ceil((toDate - startOfNextYear) / (1000 * 60 * 60 * 24)) + 1);
 
                     await pool.query(
                         `INSERT INTO leave_history 
                         (army_no, leave_type, from_date, to_date, status, no_of_days, reason_for_leave, 
                         address_on_leave, recommendation, section_officer, recommendation_date, is_extended)
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_DATE, $11)`,
-                        [armyNo, latestLeaveType, startOfNextYear, formData.toDate, 'PENDING', 0,
+                        [armyNo, latestLeaveType, startOfNextYear, formData.toDate, 'PENDING', days2,
                         formData.reason, formData.address, formData.recommendation, formData.sectionOfficerName, true]
                     );
+                    await pool.query(
+                      `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
+                      [fromDate, toDate]
+                  );                  
 
                     return res.status(200).json({ message: "Extended leave spanning two years submitted successfully" });
                 }
 
                 // **Regular Extension (Single Year)**
+                const absentResult = await pool.query(
+                  `SELECT COUNT(*) AS absent_count
+                   FROM absent
+                   WHERE army_no = $1 AND date BETWEEN $2 AND CURRENT_DATE`,
+                  [armyNo, fromDate]
+              );
+              
+              // Extract count and ensure a default value of 0 if no records are found
+              const absentCount = absentResult.rows.length > 0 ? parseInt(absentResult.rows[0].absent_count) : 0;
+              
+              const days = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
+                  ? absentCount
+                  : (Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1);
                 const extensionQuery = `
                     INSERT INTO leave_history 
                     (army_no, leave_type, from_date, to_date, status, no_of_days, reason_for_leave, 
@@ -109,47 +150,95 @@ const leaveController = {
                     formData.fromDate,
                     formData.toDate,
                     'PENDING',
-                    0,
+                    days,
                     formData.reason,
                     formData.address,
                     formData.recommendation,
                     formData.sectionOfficerName,
                     true // Mark as an extension
                 ]);
+                await pool.query(
+                  `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
+                  [fromDate, toDate]
+              );
+              
 
                 return res.status(200).json({ message: "Leave extended successfully" });
             } else {
                 return res.status(400).json({ message: "No previous leave found for extension" });
             }
         }
-
+        const latestLeaveType = formData.leaveType;
         // **Splitting Regular Leave Across Two Years**
         if (fromDate.getFullYear() !== toDate.getFullYear()) {
             const endOfYear = new Date(fromDate.getFullYear(), 11, 31); // Dec 31 of start year
             const startOfNextYear = new Date(toDate.getFullYear(), 0, 1); // Jan 1 of next year
+            
+            const absentResult = await pool.query(
+              `SELECT COUNT(*) AS absent_count
+               FROM absent
+               WHERE army_no = $1 AND date BETWEEN $2 AND CURRENT_DATE`,
+              [armyNo, fromDate]
+          );
+          
+          // Extract count and ensure a default value of 0 if no records are found
+          const absentCount = absentResult.rows.length > 0 ? parseInt(absentResult.rows[0].absent_count) : 0;
+          
+          const days1 = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
+              ? absentCount
+              : (Math.ceil((endOfYear - fromDate) / (1000 * 60 * 60 * 24)) + 1);
 
             await pool.query(
                 `INSERT INTO leave_history 
                 (army_no, leave_type, from_date, to_date, status, no_of_days, reason_for_leave, 
                 address_on_leave, recommendation, section_officer, recommendation_date) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_DATE)`,
-                [armyNo, formData.leaveType, formData.fromDate, endOfYear, 'PENDING', 0,
+                [armyNo, formData.leaveType, formData.fromDate, endOfYear, 'PENDING', days1,
                 formData.reason, formData.address, formData.recommendation, formData.sectionOfficerName]
             );
+
+            absentResult = await pool.query(
+                      `SELECT COUNT(*) AS absent_count
+                       FROM absent
+                       WHERE army_no = $1 AND date BETWEEN $2 AND CURRENT_DATE`,
+                      [armyNo, startOfNextYear]
+                  );
+            absentCount = absentResult.rows.length > 0 ? parseInt(absentResult.rows[0].absent_count) : 0;
+            const days2 = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
+                  ? absentCount
+                  : (Math.ceil((toDate - startOfNextYear) / (1000 * 60 * 60 * 24)) + 1);
 
             await pool.query(
                 `INSERT INTO leave_history 
                 (army_no, leave_type, from_date, to_date, status, no_of_days, reason_for_leave, 
                 address_on_leave, recommendation, section_officer, recommendation_date) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_DATE)`,
-                [armyNo, formData.leaveType, startOfNextYear, formData.toDate, 'PENDING', 0,
+                [armyNo, formData.leaveType, startOfNextYear, formData.toDate, 'PENDING', days2,
                 formData.reason, formData.address, formData.recommendation, formData.sectionOfficerName]
             );
+            await pool.query(
+              `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
+              [fromDate, toDate]
+          );
+          
 
             return res.status(200).json({ message: "Leave spanning two years submitted successfully" });
         }
 
         // **Insert Normal Leave Record**
+        const absentResult = await pool.query(
+          `SELECT COUNT(*) AS absent_count
+           FROM absent
+           WHERE army_no = $1 AND date BETWEEN $2 AND CURRENT_DATE`,
+          [armyNo, fromDate]
+      );
+      
+      // Extract count and ensure a default value of 0 if no records are found
+      const absentCount = absentResult.rows.length > 0 ? parseInt(absentResult.rows[0].absent_count) : 0;
+      
+      const days = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
+          ? absentCount
+          : (Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1);
         const insertQuery = `
             INSERT INTO leave_history 
             (army_no, leave_type, from_date, to_date, status, no_of_days, reason_for_leave, 
@@ -163,12 +252,17 @@ const leaveController = {
             formData.fromDate,
             formData.toDate,
             'PENDING',
-            0,
+            days,
             formData.reason,
             formData.address,
             formData.recommendation,
             formData.sectionOfficerName
         ]);
+        await pool.query(
+          `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
+          [fromDate, toDate]
+      );      
+
 
         return res.status(200).json({ message: 'Successfully submitted' });
 
@@ -362,7 +456,6 @@ FROM pending_leaves pl;
       const { decision } = req.body; // Extract decision from request body
       const { id } = req.params; // Extract leave_id from URL params
   
-      // Validate decision input (prevents SQL injection & incorrect values)
       if (!["APPROVED", "REJECTED"].includes(decision)) {
         return res.status(400).json({ error: "Invalid decision value" });
       }
@@ -386,15 +479,14 @@ FROM pending_leaves pl;
 },
 fetchRecords: async (req, res) => {
   try {
-    const { army_no, year, leave_type } = req.query; // Extract parameters from request body
-
+    const { army_no, fromDate, toDate, leave_type } = req.query;
     // Validate inputs
-    if (!army_no || !year || !leave_type) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!fromDate || !toDate) {
+      return res.status(400).json({ error: "Both fromDate and toDate are required." });
     }
 
-    // SQL Query to fetch leave records along with employee name
-    const query = `
+    // Base SQL Query
+    let query = `
       SELECT 
         lh.from_date, 
         lh.to_date, 
@@ -405,13 +497,28 @@ fetchRecords: async (req, res) => {
         e.faculty
       FROM leave_history lh
       JOIN employees e ON lh.army_no = e.army_no
-      WHERE lh.army_no = $1 
-        AND EXTRACT(YEAR FROM lh.from_date) = $2
-        AND lh.leave_type = $3
-      ORDER BY lh.from_date DESC;
+      WHERE lh.from_date BETWEEN $1 AND $2 AND lh.status='APPROVED'
     `;
 
-    const { rows } = await pool.query(query, [army_no, year, leave_type]);
+    let params = [fromDate, toDate];
+    let paramIndex = 3;
+
+    // If army_no is provided, add condition
+    if (army_no) {
+      query += ` AND lh.army_no = $${paramIndex}`;
+      params.push(army_no);
+      paramIndex++;
+    }
+
+    // If leave_type is not "ALL", add condition
+    if (leave_type !== 'ALL') {
+      query += ` AND lh.leave_type = $${paramIndex}`;
+      params.push(leave_type);
+    }
+
+    query += ` ORDER BY lh.from_date DESC;`;
+
+    const { rows } = await pool.query(query, params);
 
     return res.status(200).json(rows);
   } catch (error) {
@@ -419,6 +526,7 @@ fetchRecords: async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 },
+
 
 
 };

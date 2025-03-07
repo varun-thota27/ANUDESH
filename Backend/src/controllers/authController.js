@@ -7,7 +7,6 @@ dotenv.config();
 
 const generateToken = (user, res) => {
 
-  
   const token = jwt.sign(
     { id: user.id, username: user.username, role: user.role ,faculty :user.faculty},
     process.env.JWT_SECRET,
@@ -23,10 +22,7 @@ const generateToken = (user, res) => {
 };
 
 export const login = async (req, res) => {
-
-
   const { username, password } = req.body;
-
   try {
     const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
     const user = result.rows[0];

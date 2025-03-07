@@ -62,7 +62,9 @@ function App() {
 
   return (
     <div className="App">
+
       <Notification message={notificationMessage} />
+      
       <div className="login-container">
         <h2>Login</h2>
         <form>

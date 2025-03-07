@@ -64,22 +64,22 @@ const leaveService = {
     try {
       const response = await axios.post(
         `${API_URL}/update-details/${id}`,
-        { decision }, // ✅ Send decision in the request body
+        { decision }, //  Send decision in the request body
         {
-          withCredentials: true, // ✅ Ensure cookies (JWT) are sent
+          withCredentials: true, //  Ensure cookies (JWT) are sent
           headers: { "Content-Type": "application/json" },
         }
       );
       return response.data;
     } catch (error) {
       console.error("HTTP Request Failed:", error.response ? error.response.data : error);
-      throw error; // ✅ Always throw error to handle it properly in the caller function
+      throw error; // Always throw error to handle it properly in the caller function
     }
   },
-  fetchRecords: async ({ army_no, year, leave_type }) => {
+  fetchRecords: async ({ army_no,fromDate,toDate, leave_type }) => {
     try {
       const response = await axios.get(`${API_URL}/leave-records`, {
-        params: { army_no, year, leave_type }, // ✅ Correct way to send query params
+        params: { army_no,fromDate,toDate, leave_type }, //  Correct way to send query params
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });

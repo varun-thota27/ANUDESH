@@ -29,7 +29,6 @@ function NavBar() {
       <div className="menu-logo">
           <img src="/image.png" alt="Logo" />
         </div>
-      {/* Logo Section */}
 
       {/* Navigation Buttons */}
       <button onClick={() => navigate("/registration")}>Registration</button>
@@ -59,6 +58,7 @@ function NavBar() {
           </div>
         )}
       </div>
+      <button onClick={() => navigate("/manpower")}>ManPower</button>
 
       {/* Logout Button */}
       <button className="logout-btn" onClick={handleLogout}>

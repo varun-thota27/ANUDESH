@@ -81,13 +81,16 @@ CREATE TABLE family_members (
 CREATE TABLE leave_history (
     army_no TEXT REFERENCES employees(army_no) ON DELETE CASCADE ON UPDATE CASCADE,
     leave_type VARCHAR(255),
-    name TEXT,
     from_date DATE,
     to_date DATE,
     status TEXT,
     no_of_days INT,
     reason_for_leave TEXT,
     address_on_leave TEXT,
-    reccomendation TEXT,
-    section_officer TEXT
+    recomendation TEXT,
+    section_officer TEXT,
+    approval_date DATE,
+    recommendation_date DATE,
+    is_extended boolean,
+    leave_id UUID DEFAULT gen_random_uuid() 
 );

@@ -26,7 +26,7 @@ app.use(cookieParser());
 
 app.get('/api/login', (req, res) => {
 
-  const token = req.cookies.jwt; // ✅ Ensure correct name
+  const token = req.cookies.jwt;
 
   if (!token) {
     return res.status(401).json({ error: "Unauthorized - No token found" });
