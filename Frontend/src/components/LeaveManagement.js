@@ -89,8 +89,6 @@ const LeaveManagement = () => {
   
       // Call updateDetails only if the decision is "Approved"
         await leaveService.updateDetails(id,decision);
-      
-      
   
       // Update the selected employee's pending leaves
       setSelectedEmployee((prevEmployee) => ({

@@ -85,6 +85,8 @@ const leaveController = {
                   
                   const days1 = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
                       ? absentCount
+                      : (latestLeaveType === 'CML')
+                      ? 2 * (Math.ceil((endOfYear - fromDate) / (1000 * 60 * 60 * 24))+1)
                       : (Math.ceil((endOfYear - fromDate) / (1000 * 60 * 60 * 24)) + 1);
                   
                     await pool.query(
@@ -105,6 +107,8 @@ const leaveController = {
                   absentCount = absentResult.rows.length > 0 ? parseInt(absentResult.rows[0].absent_count) : 0;
                   const days2 = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
                   ? absentCount
+                  : (latestLeaveType === 'CML')
+                  ? 2 * (Math.ceil((toDate - startOfNextYear) / (1000 * 60 * 60 * 24))+1)
                   : (Math.ceil((toDate - startOfNextYear) / (1000 * 60 * 60 * 24)) + 1);
 
                     await pool.query(
@@ -114,11 +118,7 @@ const leaveController = {
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_DATE, $11)`,
                         [armyNo, latestLeaveType, startOfNextYear, formData.toDate, 'PENDING', days2,
                         formData.reason, formData.address, formData.recommendation, formData.sectionOfficerName, true]
-                    );
-                    await pool.query(
-                      `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
-                      [fromDate, toDate]
-                  );                  
+                    );                 
 
                     return res.status(200).json({ message: "Extended leave spanning two years submitted successfully" });
                 }
@@ -136,6 +136,8 @@ const leaveController = {
               
               const days = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
                   ? absentCount
+                  : (latestLeaveType === 'CML')
+                  ? 2 * (Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24))+1)
                   : (Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1);
                 const extensionQuery = `
                     INSERT INTO leave_history 
@@ -157,12 +159,6 @@ const leaveController = {
                     formData.sectionOfficerName,
                     true // Mark as an extension
                 ]);
-                await pool.query(
-                  `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
-                  [fromDate, toDate]
-              );
-              
-
                 return res.status(200).json({ message: "Leave extended successfully" });
             } else {
                 return res.status(400).json({ message: "No previous leave found for extension" });
@@ -186,6 +182,8 @@ const leaveController = {
           
           const days1 = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
               ? absentCount
+              : (latestLeaveType === 'CML')
+              ? 2 * (Math.ceil((endOfYear - fromDate) / (1000 * 60 * 60 * 24))+1)
               : (Math.ceil((endOfYear - fromDate) / (1000 * 60 * 60 * 24)) + 1);
 
             await pool.query(
@@ -206,6 +204,8 @@ const leaveController = {
             absentCount = absentResult.rows.length > 0 ? parseInt(absentResult.rows[0].absent_count) : 0;
             const days2 = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
                   ? absentCount
+                  : (latestLeaveType === 'CML')
+                  ? 2 * (Math.ceil((toDate - startOfNextYear) / (1000 * 60 * 60 * 24))+1)
                   : (Math.ceil((toDate - startOfNextYear) / (1000 * 60 * 60 * 24)) + 1);
 
             await pool.query(
@@ -216,11 +216,6 @@ const leaveController = {
                 [armyNo, formData.leaveType, startOfNextYear, formData.toDate, 'PENDING', days2,
                 formData.reason, formData.address, formData.recommendation, formData.sectionOfficerName]
             );
-            await pool.query(
-              `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
-              [fromDate, toDate]
-          );
-          
 
             return res.status(200).json({ message: "Leave spanning two years submitted successfully" });
         }
@@ -238,6 +233,8 @@ const leaveController = {
       
       const days = (latestLeaveType === 'RH' || latestLeaveType === 'CL')
           ? absentCount
+          : (latestLeaveType === 'CML')
+          ? 2 * (Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24))+1)
           : (Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1);
         const insertQuery = `
             INSERT INTO leave_history 
@@ -257,12 +254,7 @@ const leaveController = {
             formData.address,
             formData.recommendation,
             formData.sectionOfficerName
-        ]);
-        await pool.query(
-          `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
-          [fromDate, toDate]
-      );      
-
+        ]);     
 
         return res.status(200).json({ message: 'Successfully submitted' });
 
@@ -275,7 +267,6 @@ const leaveController = {
   getById: async (req, res) => {
     const { id } = req.params;
     try {
-
       let result;
       const armyNo = String(id);
         result = await pool.query(`
@@ -403,7 +394,7 @@ const leaveController = {
     FROM employees e
     JOIN leaves le ON 1=1
     LEFT JOIN (
-        -- Calculate the total leave days taken for the current year
+        -- Calculate the total leave days taken for the current year, excluding "EOL on PA" and "EOL on MC"
         SELECT 
             lh.army_no,
             lh.leave_type,
@@ -411,12 +402,15 @@ const leaveController = {
         FROM leave_history lh
         WHERE lh.status = 'APPROVED'
           AND EXTRACT(YEAR FROM lh.to_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+          AND lh.leave_type NOT IN ('EOL on PA', 'EOL on MC')  -- Exclude specific leave types
         GROUP BY lh.army_no, lh.leave_type
     ) lh_taken 
     ON e.army_no = lh_taken.army_no AND le.type_of_leave = lh_taken.leave_type
     WHERE e.army_no = $1
+      AND le.type_of_leave NOT IN ('EOL on PA', 'EOL on MC')  -- Exclude from aggregation
     GROUP BY e.army_no
-), leaves_taken AS (
+)
+, leaves_taken AS (
     SELECT 
         lh.army_no,
         jsonb_agg(
@@ -469,6 +463,18 @@ FROM pending_leaves pl;
       `;
   
       await pool.query(query, [decision, id]);
+
+      if(decision === "APPROVED")
+      {
+        const query1 = `SELECT from_date,to_date from leave_history where leave_id =$1`;
+        const result=await pool.query(query1, [id]);
+        const fromDate= result.rows[0].from_date;
+        const toDate = result.rows[0].to_date;
+        await pool.query(
+        `DELETE FROM absent WHERE date BETWEEN $1 AND $2;`,
+        [fromDate, toDate]
+    ); 
+  }
   
       return res.status(200).json({ message: `Leave successfully ${decision.toLowerCase()}` });
     } catch (error) {
@@ -479,14 +485,13 @@ FROM pending_leaves pl;
 },
 fetchRecords: async (req, res) => {
   try {
-    const { army_no, fromDate, toDate, leave_type } = req.query;
+    const { army_no, year,  leave_type } = req.query; // Extract parameters from request body
     // Validate inputs
-    if (!fromDate || !toDate) {
-      return res.status(400).json({ error: "Both fromDate and toDate are required." });
+    if (!army_no || !year || !leave_type) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
-
-    // Base SQL Query
-    let query = `
+    // SQL Query to fetch leave records along with employee name
+    const query = `
       SELECT 
         lh.from_date, 
         lh.to_date, 
@@ -497,28 +502,17 @@ fetchRecords: async (req, res) => {
         e.faculty
       FROM leave_history lh
       JOIN employees e ON lh.army_no = e.army_no
-      WHERE lh.from_date BETWEEN $1 AND $2 AND lh.status='APPROVED'
+      WHERE lh.army_no = $1 
+        AND EXTRACT(YEAR FROM lh.from_date) = $2
     `;
-
-    let params = [fromDate, toDate];
-    let paramIndex = 3;
-
-    // If army_no is provided, add condition
-    if (army_no) {
-      query += ` AND lh.army_no = $${paramIndex}`;
-      params.push(army_no);
-      paramIndex++;
-    }
-
-    // If leave_type is not "ALL", add condition
     if (leave_type !== 'ALL') {
-      query += ` AND lh.leave_type = $${paramIndex}`;
-      params.push(leave_type);
+      query += ` AND lh.leave_type = $3  ORDER BY lh.from_date DESC;`;
+    }
+    else{
+      query += ` ORDER BY lh.from_date DESC;`;
     }
 
-    query += ` ORDER BY lh.from_date DESC;`;
-
-    const { rows } = await pool.query(query, params);
+    const { rows } = await pool.query(query, [army_no, year, leave_type]);
 
     return res.status(200).json(rows);
   } catch (error) {

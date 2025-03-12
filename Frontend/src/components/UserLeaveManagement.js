@@ -11,7 +11,7 @@ const LeaveHistory = ({ armyNo }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const leaveTypes = ["EL", "ML", "CL", "RH", "CCL", "PL"];
+  const leaveTypes = ["EL", "CML","HPL", "CL", "RH", "CCL", "PL","ML","EOL on PA","EOL on MC"];
 
   // Fetch leave history from backend
   useEffect(() => {
@@ -462,6 +462,8 @@ if (error) return <div>{error}</div>;
                       Print
                     </button>
                   </td>
+                ):(request.status==='APPROVED') ? (
+                  <td>REJECTED</td>
                 ):(
                   <td>TO BE APPROVED</td>
                 )}
@@ -506,7 +508,7 @@ const LeaveApplicationForm = () => {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [employees, setEmployees] = useState([]);
 
-  const leaveTypes = ['EL', 'ML', 'CL', 'RH', 'CCL', 'PL', 'Extension of Leave'];
+  const leaveTypes = ["EL", "CML","HPL", "CL", "RH", "CCL", "PL","ML","EOL on PA","EOL on MC", "Extension of Leave"];
 
   // Fetch employees list on component mount
   useEffect(() => {

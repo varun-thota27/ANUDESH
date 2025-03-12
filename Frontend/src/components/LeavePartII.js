@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import './LeaveManagement.css';
 import NavBar from './NavBar';
-import leaveService from '../services/leaveService';
+import part2orderService from '../services/partr2orderService';
 
 const LeaveRecord = () => {
   const [searchArmyNo, setSearchArmyNo] = useState('');
-const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-const [selectedLeaveType, setSelectedLeaveType] = useState('ALL');
-const [leaveRecords, setLeaveRecords] = useState([]);
-// eslint-disable-next-line
-const [selectedPerson, setSelectedPerson] = useState(null);
-const [errorMessage, setErrorMessage] = useState(''); 
+  const [selectedLeaveType, setSelectedLeaveType] = useState('ALL');
+  const [selectedFromDate, setSelectedFromDate] = useState('');
+  const [selectedToDate, setSelectedToDate] = useState('');
+  const [leaveRecords, setLeaveRecords] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(''); 
   const leaveTypes = ['ALL','EL', 'ML', 'CL', 'RH', 'CCL', 'PL'];
 
   // Dummy records with more varied leave types
@@ -29,29 +28,30 @@ const [errorMessage, setErrorMessage] = useState('');
   };
  
   const handleSubmit = async () => {
-    // Validate all fields before fetching data
-    if (!searchArmyNo || !selectedYear || !selectedLeaveType) {
-      setErrorMessage('Please fill in all fields before submitting.');
+    // Validate required fields
+    if (!selectedFromDate || !selectedToDate) {
+      setErrorMessage('Both From Date and To Date are required.');
       return;
     }
-
+  
     setErrorMessage(''); // Clear previous error messages
-
+  
     try {
-      const response = await leaveService.fetchRecords({
-        army_no: searchArmyNo,
-        year: selectedYear,
+      const response = await part2orderService.fetchLeaveRecords({
+        army_no: searchArmyNo || null,
+        fromDate: selectedFromDate,
+        toDate: selectedToDate,
         leave_type: selectedLeaveType
       });
-
+  
       console.log("Fetched Leave Records:", response);
       setLeaveRecords(Array.isArray(response) ? response : []);
-
-      // Optionally fetch and set person info
     } catch (error) {
       console.error("Error fetching leave records:", error);
+      setErrorMessage("Failed to fetch leave records. Please try again.");
     }
   };
+  
 
   const filteredRecords = leaveRecords || [];
 
@@ -138,17 +138,13 @@ const [errorMessage, setErrorMessage] = useState('');
     const content = `
       <div class="section">
         <h2><u>MILITARY COLLEGE OF EME, SECUNDERABAD</u></h2>
-        <h2><u>${selectedLeaveType === 'Leave Type' ? 'LEAVE RECORD' :` ${selectedLeaveType} LEAVE RECORD`} AS ON ${new Date().toLocaleDateString()}</u></h2>
-        
-        <div class="person-info">
-          <span>PERS NO: ${leaveRecords[0]?.army_no || ''}</span>
-          <span>TRADE: ${leaveRecords[0]?.faculty || ''}</span>
-          <span>NAME: ${leaveRecords[0]?.name || ''}</span>
-        </div>
 
         <table>
           <thead>
             <tr>
+              <th>ARMY NO</th>
+              <th>NAME</th>
+              <th>TRADE</th>
               <th>FROM</th>
               <th>TO</th>
               <th>TYPE OF LEAVE</th>
@@ -158,6 +154,9 @@ const [errorMessage, setErrorMessage] = useState('');
           <tbody>
             ${filteredRecords.map(record => `
               <tr>
+                <td>${record.army_no}</td>
+                <td>${record.name}</td>
+                <td>${record.designation}</td>
                 <td>${formatDate(record.from_date)}</td>
                 <td>${formatDate(record.to_date)}</td>
                 <td>${record.leave_type}</td>
@@ -178,28 +177,30 @@ const [errorMessage, setErrorMessage] = useState('');
       <div className="leave-record-main-container">
         <div className="leave-record-header">
           <h2 className="college-name">MILITARY COLLEGE OF EME, SECUNDERABAD</h2>
-          <h3 className="leave-record-title">{selectedLeaveType === 'Leave Type' ? 'LEAVE RECORD' : `${selectedLeaveType} LEAVE RECORD`}</h3>
         </div>
 
-        < div className="controls-container">
+        <div className="controls-container">
           <input
             type="text"
-            placeholder="Search by Pers No"
+            placeholder="Search by Pers No (Optional)"
             value={searchArmyNo}
             onChange={(e) => setSearchArmyNo(e.target.value)}
             className="search-input"
           />
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="year-select"
-          >
-            {Array.from({ length: 50 }, (_, i) => {
-              const year = new Date().getFullYear() - i;
-              return <option key={year} value={year}>{year}</option>;
-            })}
-          </select>
-
+          <input
+            type="date"
+            value={selectedFromDate}
+            onChange={(e) => setSelectedFromDate(e.target.value)}
+            className="date-input"
+            placeholder="From Date"
+          />
+          <input
+            type="date"
+            value={selectedToDate}
+            onChange={(e) => setSelectedToDate(e.target.value)}
+            className="date-input"
+            placeholder="To Date"
+          />
           <select
             value={selectedLeaveType}
             onChange={(e) => setSelectedLeaveType(e.target.value)}
@@ -210,27 +211,19 @@ const [errorMessage, setErrorMessage] = useState('');
             ))}
           </select>
           <button onClick={handleSubmit} className="submit-button">Submit</button>
-        
-        <button onClick={handlePrint} className="print-button">Print Record</button>
-      </div>
+          <button onClick={handlePrint} className="print-button">Print Record</button>
+        </div>
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-        {selectedPerson && (
-          <div className="person-info">
-            <div className="info-row">
-              <span>ARMY NO: {selectedPerson.army_no}</span>
-              <span>TRADE: {selectedPerson.faculty}</span>
-              <span>NAME: {selectedPerson.name}</span>
-            </div>
-          </div>
-        )}
 
         {leaveRecords.length > 0 && (
           <div className="table-container">
             <table className="leave-table">
               <thead>
                 <tr>
+                  <th>ARMY NO</th>
+                  <th>NAME</th>
+                  <th>TRADE</th>
                   <th>FROM</th>
                   <th>TO</th>
                   <th>TYPE OF LEAVE</th>
@@ -240,6 +233,9 @@ const [errorMessage, setErrorMessage] = useState('');
               <tbody>
                 {leaveRecords.map((record, index) => (
                   <tr key={index}>
+                    <td>{record.army_no || 'N/A'}</td>
+                    <td>{record.name}</td>
+                    <td>{record.designation}</td>
                     <td>{formatDate(record.from_date)}</td>
                     <td>{formatDate(record.to_date)}</td>
                     <td>{record.leave_type}</td>
