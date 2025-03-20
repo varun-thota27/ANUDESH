@@ -8,6 +8,7 @@ import infoRoutes from './routes/infoRoutes.js';
 import getEmployeeRoutes from './routes/getEmployeeRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
 import leaveRoutes from './routes/leaveRoutes.js';
+import manPowerRoutes from './routes/manPowerRoutes.js';
 import jwt from "jsonwebtoken";
 
 dotenv.config();
@@ -47,6 +48,7 @@ app.use("/info", infoRoutes); // Only users can access
 app.use("/attendance", attendanceRoutes);
 app.use("/leave", leaveRoutes);
 app.use("/leave-history",leaveRoutes);
+app.use("/man-power",manPowerRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/employeesAll", getEmployeeRoutes);

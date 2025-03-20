@@ -11,7 +11,7 @@ const [leaveRecords, setLeaveRecords] = useState([]);
 // eslint-disable-next-line
 const [selectedPerson, setSelectedPerson] = useState(null);
 const [errorMessage, setErrorMessage] = useState(''); 
-  const leaveTypes = ['ALL','EL', 'ML', 'CL', 'RH', 'CCL', 'PL'];
+  const leaveTypes = ["ALL","EL", "CML","HPL", "CL", "RH", "CCL", "PL","ML","EOL on PA","EOL on MC"];
 
   // Dummy records with more varied leave types
 

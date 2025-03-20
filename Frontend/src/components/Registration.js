@@ -428,11 +428,13 @@ const Registration = () => {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Ind/Non-Ind</label>
+                            <label>Category</label>
                             <select name="ind" value={formData.ind} onChange={handleChange}>
                                 <option value="">Select </option>
-                                <option value="Industrial">Industrial</option>
-                                <option value="Non-Industrial">Non-Industrial</option>
+                                <option value="Non-Ind(Centrally Controlled)">Non-Ind(Centrally Controlled)</option>
+                                <option value="Non-Ind(Unit Controlled)">Non-Ind(Unit Controlled)</option>
+                                <option value="Ind(Unit Controlled)">Ind(Unit Controlled)</option>
+                                <option value="Fire Staff">Fire Staff</option>
                             </select>
                         </div>
                     </div>
@@ -632,18 +634,52 @@ const Registration = () => {
                             <input type="text" name="kindredRollDoPtII" value={formData.kindredRollDoPtII} onChange={handleChange} required/>
                         </div>
                     </div>
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label>Audit</label>
-                            <select name="audit" value={formData.audit} onChange={handleChange}>
-                                <option value="no">No</option>
-                                <option value="yes">Yes</option>
-                            </select>
+
+                    <div className="form-section">
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>Audit</label>
+                                <select name="audit" value={formData.audit} onChange={handleChange}>
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
                         </div>
                         {formData.audit === 'yes' && (
-                            <div className="form-group">
-                                <label>Date of Audit</label>
-                                <input type="date" name="dateofaudit" value={formData.dateofaudit} onChange={handleChange} />
+                            <div className="promotions-container">
+                                {formData.audit.map((audit, index) => (
+                                    <div key={index} className="dynamic-row">
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Audit No.</label>
+                                                <input
+                                                    type="text"
+                                                    value={audit.nam}
+                                                    onChange={(e) => handlePromotionChange(index, 'name', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Date of Promotion</label>
+                                                <input
+                                                    type="date"
+                                                    value={promotion.date}
+                                                    onChange={(e) => handlePromotionChange(index, 'date', e.target.value)}
+                                                />
+                                            </div>
+                                            <button 
+                                                type="button" 
+                                                className="delete-button"
+                                                onClick={() => handlePromotionDelete(index)}
+                                                title="Delete"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                <button type="button" onClick={handlePromotionAdd} className="add-button">
+                                    Add Audit Date
+                                </button>
                             </div>
                         )}
                     </div>

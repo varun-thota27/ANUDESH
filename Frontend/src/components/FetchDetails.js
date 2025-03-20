@@ -21,8 +21,8 @@ function FetchDetails() {
   useEffect(() => {
     const fetchFaculties = async () => {
       const response = await infoService.dept();
-      console.log("Fetched Faculties:", response); // Log to verify it's an array
-      setFaculties(Array.isArray(response) ? response : []); // Ensure it’s an array
+      console.log("Fetched Faculties:", response); 
+      setFaculties(Array.isArray(response) ? response : []); 
     };
 
     fetchFaculties();
@@ -33,8 +33,8 @@ function FetchDetails() {
   useEffect(() => {
     const fetchTrades = async () => {
       const response = await infoService.trade();
-      console.log("Fetched Trade:", response); // Log to verify it's an array
-      setTrade(Array.isArray(response) ? response : []); // Ensure it’s an array
+      console.log("Fetched Trade:", response);
+      setTrade(Array.isArray(response) ? response : []); 
     };
 
     fetchTrades();
@@ -255,7 +255,6 @@ function FetchDetails() {
   };
 
   // Add console log to debug
-  console.log('Filtered Data:', filteredData);
 
   const resetFilters = () => {
     setSearchTerm('');
@@ -358,8 +357,10 @@ function FetchDetails() {
               className="filter-select"
             >
               <option value="">All Categories</option>
-              <option value="Industrial">Industrial</option>
-              <option value="Non-Industrial">Non-Industrial</option>
+              <option value="Non-Ind(Centrally Controlled)">Non-Ind(Centrally Controlled)</option>
+              <option value="Non-Ind(Unit Controlled)">Non-Ind(Unit Controlled)</option>
+              <option value="Ind(Unit Controlled)">Ind(Unit Controlled)</option>
+              <option value="Fire Staff">Fire Staff</option>
             </select>
             <select
               value={macpFilter}

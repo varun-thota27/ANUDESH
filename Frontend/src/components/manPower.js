@@ -1,8 +1,108 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import manPowerService from '../services/manPowerService';
 import NavBar from './NavBar';
 import './manPower.css';
 
 const ManPower = () => {
+  const [category, setCategory] = useState([]);
+  const [categoryWing, setCategoryWing] = useState([]);
+  const [NonIndCentral, setNonIndCentral] = useState([]);
+  const [NonIndUnit, setNonIndUnit] = useState([]);
+  const [IndUnit, setIndUnit] = useState([]);
+  const [FireStaff, setFireStaff] = useState([]);
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+         const data = await manPowerService.fetchCategory();
+         setCategory(data);
+      } catch (err) {
+        console.error('Failed to fetch categories');
+      }
+    };
+
+    fetchCategory();
+  }, []);
+
+  useEffect(() => {
+    const fetchCategoryWing = async () => {
+      try {
+         const data = await manPowerService.fetchCategoryWing();
+         const tableData = data[0].jsonb_object_agg;
+         
+         const sortedTableData = Object.fromEntries(
+          Object.entries(tableData).sort(([a], [b]) => b.localeCompare(a))
+        );
+  
+        setCategoryWing(sortedTableData);
+      } catch (err) {
+        console.error('Failed to fetch categories');
+      }
+    };
+
+    fetchCategoryWing();
+  }, []);
+
+  useEffect(() => {
+    const fetchNonIndCentral = async () => {
+      try {
+        const data = await manPowerService.fetchNonIndCentral();
+        setNonIndCentral(data);
+      } catch (err) {
+        console.error('Failed to fetch categories');
+      }
+    };
+
+    fetchNonIndCentral();
+  }, []);
+
+  useEffect(() => {
+    const fetchNonIndUnit = async () => {
+      try {
+        const data = await manPowerService.fetchNonIndUnit();
+        setNonIndUnit(data);
+      } catch (err) {
+        console.error('Failed to fetch categories');
+      }
+    };
+
+    fetchNonIndUnit();
+  }, []);
+
+  useEffect(() => {
+    const fetchIndUnit = async () => {
+      try {
+        const data = await manPowerService.fetchIndUnit();
+        setIndUnit(data);
+      } catch (err) {
+        console.error('Failed to fetch categories');
+      }
+    };
+
+    fetchIndUnit();
+  }, []);
+
+  useEffect(() => {
+    const fetchFireStaff = async () => {
+      try {
+        const data = await manPowerService.fetchFireStaff();
+        setFireStaff(data);
+      } catch (err) {
+        console.error('Failed to fetch categories');
+      }
+    };
+
+    fetchFireStaff();
+  }, []);
+
+  const totals = category.reduce((acc, row) => ({
+    auth: acc.auth + Number(row.sum || 0),  // Convert to number before adding
+    held: acc.held + Number(row.held || 0),  // Convert to number before adding
+    defi: acc.defi + (Number(row.sum || 0) - Number(row.defi || 0)) // Convert both before subtraction
+}), { 
+    auth: 0, held: 0, defi: 0
+});
+
   const handlePrint = () => {
     // Create a hidden iframe for printing
     const printFrame = document.createElement('iframe');
@@ -101,13 +201,23 @@ const ManPower = () => {
     }, 2000);
   };
 
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate("/tradeInfo");
+  };
+
+  const faculties = ["HQ ADM", "HQ TRG", "FEMT", "FEL", "FEME", "FAE", "CTW", "SDD", "FDE"];
+
   return (
-    <div className="manpower-container">
+    <div>
       <NavBar />
-      <button className="print-button5" onClick={handlePrint}>Print Tables</button>
-      
+    <div className="manpower-container">
+    <div className="button-container">
+  <button className="print-button5" onClick={handlePrint}>Print Tables</button>
+  <button className="info-button5" onClick={handleNavigate}>Trade Info</button>
+</div>
       <div className="tables-container">
-        {/* Table 1: MANPOWER STATE - CIV */}
         <div className="table-wrapper">
           <h3>MANPOWER STATE : CIV</h3>
           <table>
@@ -122,45 +232,23 @@ const ManPower = () => {
               </tr>
             </thead>
             <tbody>
+            {category.map((app, index) => (
+                <tr key={index}>
+                  <td>{app.cat}</td>
+                  <td contentEditable="true">{app.sum}</td>
+                  <td>--</td>
+                  <td contentEditable="true">{app.held}</td>
+                  <td>(-) {(Number(app.sum,10)||0)-(Number(app.defi,10)||0)}</td>
+                  <td contentEditable="true"></td>
+                </tr>
+              ))}
               <tr>
-                <td>Non-Ind (Centrally Controlled)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Non-Ind (Unit Controlled)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Ind (Unit Controlled)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Fire Staff</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Total</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+              <td><b>Total</b></td>
+              <td><b>{totals.auth}</b></td>
+              <td><b>--</b></td>
+              <td><b>{totals.held}</b></td>
+              <td><b>{totals.defi}</b></td>
+              <td></td>
               </tr>
             </tbody>
           </table>
@@ -170,471 +258,393 @@ const ManPower = () => {
         <div className="table-wrapper">
           <h3>MANPOWER SUMMARY STATE : CIV DEF EMP</h3>
           <table>
-            <thead>
-              <tr>
-                <th rowSpan="2">Cat</th>
-                <th colSpan="2">Auth Wg</th>
-                <th colSpan="2">Trg Wg</th>
-                <th colSpan="2">FEMT</th>
-                <th colSpan="2">FEL</th>
-                <th colSpan="2">FEME</th>
-                <th colSpan="2">FAE</th>
-                <th colSpan="2">CTW</th>
-                <th colSpan="2">SDD</th>
-                <th colSpan="2">FDE</th>
-                <th colSpan="2">TOTAL</th>
-              </tr>
-              <tr>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Non-Ind (Centrally Controlled)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Non-Ind (Unit Controlled)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Ind (Unit Controlled)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Fire Staff</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Total</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-            </tbody>
-          </table>
+          <thead>
+        <tr>
+          <th rowSpan="2">Cat</th>
+          {faculties.map((faculty) => (
+            <th colSpan="2" key={faculty}>{faculty}</th>
+          ))}
+          <th colSpan="2">TOTAL</th>
+        </tr>
+        <tr>
+          {faculties.map(() => (
+            <>
+              <th>A</th>
+              <th>H</th>
+            </>
+          ))}
+          <th>A</th>
+          <th>H</th>
+        </tr>
+      </thead>
+      <tbody>
+  {Object.entries(categoryWing)
+    .sort(([a], [b]) => {
+      if (a === "Total") return 1; // Move TOTAL to the bottom
+      if (b === "Total") return -1;
+      return b.localeCompare(a); // Sort remaining categories in descending order
+    })
+    .map(([category, values]) => (
+      <tr key={category}>
+        <td>{category}</td>
+        {faculties.map((faculty) => {
+          const facultyData = values.find((item) => item.faculty === faculty) || { auth: 0, employee_count: 0 };
+          return (
+            <React.Fragment key={faculty}>
+              <td>{facultyData.auth}</td>
+              <td>{facultyData.employee_count}</td>
+            </React.Fragment>
+          );
+        })}
+        <td>{values.reduce((sum, item) => sum + Number(item.auth || 0), 0)}</td>
+        <td>{values.reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</td>
+      </tr>
+    ))}
+
+  {/* TOTAL ROW */}
+  <tr>
+    <td><b>Total</b></td>
+    {faculties.map((faculty) => {
+      const total = Object.values(categoryWing).flat().reduce(
+        (acc, row) => {
+          if (row.faculty === faculty) {
+            acc.auth += Number(row.auth || 0);
+            acc.held += Number(row.employee_count || 0);
+          }
+          return acc;
+        },
+        { auth: 0, held: 0 }
+      );
+      return (
+        <React.Fragment key={faculty}>
+          <td><b>{total.auth}</b></td>
+          <td><b>{total.held}</b></td>
+        </React.Fragment>
+      );
+    })}
+    <td><b>{Object.values(categoryWing).flat().reduce((sum, item) => sum + Number(item.auth || 0), 0)}</b></td>
+    <td><b>{Object.values(categoryWing).flat().reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</b></td>
+  </tr>
+</tbody>
+
+    </table>
         </div>
 
         {/* Table 3: MANPOWER DISTR : NON IND CENTRALLY CONTROLLED */}
         <div className="table-wrapper">
           <h3>MANPOWER DISTR : NON IND CENTRALLY CONTROLLED</h3>
           <table>
-            <thead>
-              <tr>
-                <th rowSpan="2">Trade</th>
-                <th colSpan="2">Adm Wg</th>
-                <th colSpan="2">Trg Wg</th>
-                <th colSpan="2">FEMT</th>
-                <th colSpan="2">FEL</th>
-                <th colSpan="2">FEME</th>
-                <th colSpan="2">FAE</th>
-                <th colSpan="2">CTW</th>
-                <th colSpan="2">SDD</th>
-                <th colSpan="2">FDE</th>
-                <th colSpan="2">TOTAL</th>
-              </tr>
-              <tr>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>O/Supdt</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Cashier</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Clerks</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>CMD</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Liby Gde II & III</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Lab Demo</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Lab Asst</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Drmn Gde I & II (Snr Drmn)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Steno Gde II (now Gde I)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Steno Gde III (now Gde II)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Photographer</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Poster Artist</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Cinema Operator Gde I</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Ferro Printer</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Supvr Electric (Foreman)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Store Keeper</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Supvr LH(NT)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Leading Hand(NT)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Total</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-            </tbody>
-          </table>
+              <thead>
+            <tr>
+              <th rowSpan="2">Trade</th>
+              {faculties.map((faculty) => (
+                <th colSpan="2" key={faculty}>{faculty}</th>
+              ))}
+              <th colSpan="2">TOTAL</th>
+            </tr>
+            <tr>
+              {faculties.map(() => (
+                <>
+                  <th>A</th>
+                  <th>H</th>
+                </>
+              ))}
+              <th>A</th>
+              <th>H</th>
+            </tr>
+          </thead>
+          <tbody>
+      {Object.entries(NonIndCentral)
+        .sort(([a], [b]) => {
+          if (a === "Total") return 1; // Move TOTAL to the bottom
+          if (b === "Total") return -1;
+          return a.localeCompare(b); // Sort remaining categories in descending order
+        })
+        .map(([category, values]) => (
+          <tr key={category}>
+            <td>{category}</td>
+            {faculties.map((faculty) => {
+              const facultyData = values.find((item) => item.faculty === faculty) || { auth: 0, employee_count: 0 };
+              return (
+                <React.Fragment key={faculty}>
+                  <td contentEditable='true'>{facultyData.auth}</td>
+                  <td contentEditable='true'>{facultyData.employee_count}</td>
+                </React.Fragment>
+              );
+            })}
+            <td>{values.reduce((sum, item) => sum + Number(item.auth || 0), 0)}</td>
+            <td>{values.reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</td>
+          </tr>
+        ))}
+
+      {/* TOTAL ROW */}
+      <tr>
+        <td><b>Total</b></td>
+        {faculties.map((faculty) => {
+          const total = Object.values(NonIndCentral).flat().reduce(
+            (acc, row) => {
+              if (row.faculty === faculty) {
+                acc.auth += Number(row.auth || 0);
+                acc.held += Number(row.employee_count || 0);
+              }
+              return acc;
+            },
+            { auth: 0, held: 0 }
+          );
+          return (
+            <React.Fragment key={faculty}>
+              <td><b>{total.auth}</b></td>
+              <td><b>{total.held}</b></td>
+            </React.Fragment>
+          );
+        })}
+        <td><b>{Object.values(NonIndCentral).flat().reduce((sum, item) => sum + Number(item.auth || 0), 0)}</b></td>
+        <td><b>{Object.values(NonIndCentral).flat().reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</b></td>
+      </tr>
+    </tbody>
+
+    </table>
+    <td  contentEditable='true'>@ Foot notes
+                </td>
         </div>
 
         {/* Table 4: MANPOWER DISTR: NON IND UNIT CONTROLLED */}
         <div className="table-wrapper">
           <h3>MANPOWER DISTR: NON IND UNIT CONTROLLED </h3>
-          <table>
-            <thead>
-            <tr>
+            <table>
+                <thead>
+              <tr>
                 <th rowSpan="2">Trade</th>
-                <th colSpan="2">Adm Wg</th>
-                <th colSpan="2">Trg Wg</th>
-                <th colSpan="2">FEMT</th>
-                <th colSpan="2">FEL</th>
-                <th colSpan="2">FEME</th>
-                <th colSpan="2">FAE</th>
-                <th colSpan="2">CTW</th>
-                <th colSpan="2">SDD</th>
-                <th colSpan="2">FDE</th>
+                {faculties.map((faculty) => (
+                  <th colSpan="2" key={faculty}>{faculty}</th>
+                ))}
                 <th colSpan="2">TOTAL</th>
               </tr>
               <tr>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
+                {faculties.map(() => (
+                  <>
+                    <th>A</th>
+                    <th>H</th>
+                  </>
+                ))}
+                <th>A</th>
+                <th>H</th>
               </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>Cinema Proj Mate</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Laboratory Attendant</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Daftry</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Messenger</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Mali</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Chowkidar</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Safaiwala</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Barbers</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Washerman</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Tailor</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Boot Maker</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Cook</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Total</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-            </tbody>
-          </table>
-          <td>
-                <td>@ -01 x Offrs Mess | # -01 x 'A' Coy, 02 x Offrs Mess | $ -02 x Offrs Mess | % -02 x 'A' Coy |  
-                & -03 x 'A' Coy | * -03 x Offrs Mess, 01 x JCOs Mess, 03 x 'A' Coy | ^ -01 x 'B' Coy, 01 x 'C' Coy | 
-                ~ -02 x 'B' Coy, 02 x 'C' Coy | 
-                ** -01 x 'B' Coy, 02 x 'C' Coy | ^^ -02 x 'E' Coy | ~~ -02 x 'E' Coy  
-                </td>
-            </td>
+        {Object.entries(NonIndUnit)
+          .sort(([a], [b]) => {
+            if (a === "Total") return 1; // Move TOTAL to the bottom
+            if (b === "Total") return -1;
+            return a.localeCompare(b); // Sort remaining categories in descending order
+          })
+          .map(([category, values]) => (
+            <tr key={category}>
+              <td>{category}</td>
+              {faculties.map((faculty) => {
+                const facultyData = values.find((item) => item.faculty === faculty) || { auth: 0, employee_count: 0 };
+                return (
+                  <React.Fragment key={faculty}>
+                    <td contentEditable='true'>{facultyData.auth}</td>
+                    <td contentEditable='true'>{facultyData.employee_count}</td>
+                  </React.Fragment>
+                );
+              })}
+              <td>{values.reduce((sum, item) => sum + Number(item.auth || 0), 0)}</td>
+              <td>{values.reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</td>
+            </tr>
+          ))}
 
+        {/* TOTAL ROW */}
+        <tr>
+          <td><b>Total</b></td>
+          {faculties.map((faculty) => {
+            const total = Object.values(NonIndUnit).flat().reduce(
+              (acc, row) => {
+                if (row.faculty === faculty) {
+                  acc.auth += Number(row.auth || 0);
+                  acc.held += Number(row.employee_count || 0);
+                }
+                return acc;
+              },
+              { auth: 0, held: 0 }
+            );
+            return (
+              <React.Fragment key={faculty}>
+                <td><b>{total.auth}</b></td>
+                <td><b>{total.held}</b></td>
+              </React.Fragment>
+            );
+          })}
+          <td><b>{Object.values(NonIndUnit).flat().reduce((sum, item) => sum + Number(item.auth || 0), 0)}</b></td>
+          <td><b>{Object.values(NonIndUnit).flat().reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</b></td>
+        </tr>
+      </tbody>
+
+      </table>
+                <td  contentEditable='true'>@ Foot notes
+                </td>
         </div>
 
         {/* Table 5: MANPOWER DISTR -IND UNIT CONTROLLED*/}
         <div className="table-wrapper">
           <h3>MANPOWER DISTR : IND UNIT CONTROLLED</h3>
           <table>
-            <thead>
-            <tr>
+                <thead>
+              <tr>
                 <th rowSpan="2">Trade</th>
-                <th colSpan="2">Adm Wg</th>
-                <th colSpan="2">Trg Wg</th>
-                <th colSpan="2">FEMT</th>
-                <th colSpan="2">FEL</th>
-                <th colSpan="2">FEME</th>
-                <th colSpan="2">FAE</th>
-                <th colSpan="2">CTW</th>
-                <th colSpan="2">SDD</th>
-                <th colSpan="2">FDE</th>
+                {faculties.map((faculty) => (
+                  <th colSpan="2" key={faculty}>{faculty}</th>
+                ))}
                 <th colSpan="2">TOTAL</th>
               </tr>
               <tr>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
+                {faculties.map(() => (
+                  <>
+                    <th>A</th>
+                    <th>H</th>
+                  </>
+                ))}
+                <th>A</th>
+                <th>H</th>
               </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>Book Binder</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Carpenter & Joiner</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Fitter</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Inst Mech</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Machinist</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Painter & Decorater</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Moulder</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>TCS</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Artist</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>TCM(ILC)</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Tradesman Mate</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Total</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-            </tbody>
-          </table>
-          <td>
-            <td>*02 x Offrs Mess</td>
-          </td>
+        {Object.entries(IndUnit)
+          .sort(([a], [b]) => {
+            if (a === "Total") return 1; // Move TOTAL to the bottom
+            if (b === "Total") return -1;
+            return a.localeCompare(b); // Sort remaining categories in descending order
+          })
+          .map(([category, values]) => (
+            <tr key={category}>
+              <td>{category}</td>
+              {faculties.map((faculty) => {
+                const facultyData = values.find((item) => item.faculty === faculty) || { auth: 0, employee_count: 0 };
+                return (
+                  <React.Fragment key={faculty}>
+                    <td contentEditable='true'>{facultyData.auth}</td>
+                    <td contentEditable='true'>{facultyData.employee_count}</td>
+                  </React.Fragment>
+                );
+              })}
+              <td>{values.reduce((sum, item) => sum + Number(item.auth || 0), 0)}</td>
+              <td>{values.reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</td>
+            </tr>
+          ))}
+
+        {/* TOTAL ROW */}
+        <tr>
+          <td><b>Total</b></td>
+          {faculties.map((faculty) => {
+            const total = Object.values(IndUnit).flat().reduce(
+              (acc, row) => {
+                if (row.faculty === faculty) {
+                  acc.auth += Number(row.auth || 0);
+                  acc.held += Number(row.employee_count || 0);
+                }
+                return acc;
+              },
+              { auth: 0, held: 0 }
+            );
+            return (
+              <React.Fragment key={faculty}>
+                <td><b>{total.auth}</b></td>
+                <td><b>{total.held}</b></td>
+              </React.Fragment>
+            );
+          })}
+          <td><b>{Object.values(IndUnit).flat().reduce((sum, item) => sum + Number(item.auth || 0), 0)}</b></td>
+          <td><b>{Object.values(IndUnit).flat().reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</b></td>
+        </tr>
+      </tbody>
+
+      </table>
+          
+                <td  contentEditable='true'>@ Foot notes
+                </td>
         </div>
 
         {/* Table 6: MANPOWER DISTR: FIRE STAFF */}
         <div className="table-wrapper">
           <h3>MANPOWER DISTR : FIRE STAFF</h3>
           <table>
-            <thead>
-            <tr>
+                <thead>
+              <tr>
                 <th rowSpan="2">Trade</th>
-                <th colSpan="2">Adm Wg</th>
-                <th colSpan="2">Trg Wg</th>
-                <th colSpan="2">FEMT</th>
-                <th colSpan="2">FEL</th>
-                <th colSpan="2">FEME</th>
-                <th colSpan="2">FAE</th>
-                <th colSpan="2">CTW</th>
-                <th colSpan="2">SDD</th>
-                <th colSpan="2">FDE</th>
+                {faculties.map((faculty) => (
+                  <th colSpan="2" key={faculty}>{faculty}</th>
+                ))}
                 <th colSpan="2">TOTAL</th>
               </tr>
               <tr>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
-                <th>A</th><th>H</th>
+                {faculties.map(() => (
+                  <>
+                    <th>A</th>
+                    <th>H</th>
+                  </>
+                ))}
+                <th>A</th>
+                <th>H</th>
               </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>Supvr Fire</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>LH Fire</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Fire Engine Driver</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Fireman</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Fitter</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-              <tr>
-                <td>Total</td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-              </tr>
-            </tbody>
-          </table>
-          <td>
-            <td>*02 x Offrs Mess</td>
-          </td>
+        {Object.entries(FireStaff)
+          .sort(([a], [b]) => {
+            if (a === "Total") return 1; // Move TOTAL to the bottom
+            if (b === "Total") return -1;
+            return a.localeCompare(b); // Sort remaining categories in descending order
+          })
+          .map(([category, values]) => (
+            <tr key={category}>
+              <td>{category}</td>
+              {faculties.map((faculty) => {
+                const facultyData = values.find((item) => item.faculty === faculty) || { auth: 0, employee_count: 0 };
+                return (
+                  <React.Fragment key={faculty}>
+                    <td contentEditable='true'>{facultyData.auth}</td>
+                    <td contentEditable='true'>{facultyData.employee_count}</td>
+                  </React.Fragment>
+                );
+              })}
+              <td>{values.reduce((sum, item) => sum + Number(item.auth || 0), 0)}</td>
+              <td>{values.reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</td>
+            </tr>
+          ))}
+
+        {/* TOTAL ROW */}
+        <tr>
+          <td><b>Total</b></td>
+          {faculties.map((faculty) => {
+            const total = Object.values(FireStaff).flat().reduce(
+              (acc, row) => {
+                if (row.faculty === faculty) {
+                  acc.auth += Number(row.auth || 0);
+                  acc.held += Number(row.employee_count || 0);
+                }
+                return acc;
+              },
+              { auth: 0, held: 0 }
+            );
+            return (
+              <React.Fragment key={faculty}>
+                <td><b>{total.auth}</b></td>
+                <td><b>{total.held}</b></td>
+              </React.Fragment>
+            );
+          })}
+          <td><b>{Object.values(FireStaff).flat().reduce((sum, item) => sum + Number(item.auth || 0), 0)}</b></td>
+          <td><b>{Object.values(FireStaff).flat().reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</b></td>
+        </tr>
+      </tbody>
+
+      </table>
+          
+                <td  contentEditable='true'>@ Foot notes
+                </td>
         </div>
       </div>
+    </div>
     </div>
   );
 };

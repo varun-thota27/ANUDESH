@@ -485,13 +485,15 @@ FROM pending_leaves pl;
 },
 fetchRecords: async (req, res) => {
   try {
-    const { army_no, year,  leave_type } = req.query; // Extract parameters from request body
+    const { army_no, year, leave_type } = req.query; // Extract parameters from request body
+
     // Validate inputs
     if (!army_no || !year || !leave_type) {
       return res.status(400).json({ error: "Missing required fields" });
     }
+
     // SQL Query to fetch leave records along with employee name
-    const query = `
+    let query = `
       SELECT 
         lh.from_date, 
         lh.to_date, 
@@ -505,24 +507,25 @@ fetchRecords: async (req, res) => {
       WHERE lh.army_no = $1 
         AND EXTRACT(YEAR FROM lh.from_date) = $2
     `;
+
+    let params = [army_no, year]; // Parameter array
+
     if (leave_type !== 'ALL') {
-      query += ` AND lh.leave_type = $3  ORDER BY lh.from_date DESC;`;
-    }
-    else{
+      query += ` AND lh.leave_type = $3 ORDER BY lh.from_date DESC;`;
+      params.push(leave_type);
+    } else {
       query += ` ORDER BY lh.from_date DESC;`;
     }
 
-    const { rows } = await pool.query(query, [army_no, year, leave_type]);
+    // Execute query with appropriate parameters
+    const { rows } = await pool.query(query, params);
 
     return res.status(200).json(rows);
   } catch (error) {
     console.error("Error fetching leave records:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-},
-
-
-
+}
 };
 
 

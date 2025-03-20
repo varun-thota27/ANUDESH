@@ -20,6 +20,33 @@
   background-color: #173B45;
 }
 
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* Aligns buttons to the right */
+  gap: 10px; /* Adds spacing between buttons */
+  padding-right: 20px; /* Adjust spacing from the right */
+}
+
+.info-button5 {
+  margin: 20px;
+  padding: 10px 20px;
+  height: 50px;
+  width: 150px;
+  background-color: #173B45;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: block; /* Ensures it takes full width available */
+  margin-left: auto; /* Pushes the button to the right */
+}
+
+.info-button5:hover {
+  background-color: #0E2A32;
+}
+
+
 .tables-container {
   display: flex;
   overflow-x: auto;
