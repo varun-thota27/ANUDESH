@@ -23,7 +23,7 @@ export const UpdateEmployee = async (req, res) => {
                 macp = $41, promotion = $42, permanent_address = $43, temporary_address = $44,
                 discp_cases = $45, discp_remarks = $46, probation_period = $47,
                 confirmed_date = TO_DATE($48, 'YYYY-MM-DD'), ltc_ta_da = $49, toa_sos_in_mceme = $50,
-                pay_level = $51, basic_pay = $52
+                pay_level = $51, basic_pay = $52,retirement=$53,retirement_type=$54
             WHERE army_no = $4 RETURNING *;
         `;
 
@@ -41,7 +41,8 @@ export const UpdateEmployee = async (req, res) => {
             formData.mobile_no, formData.email_id, formData.uid_no, formData.macp, formData.promotion,
             formData.permanent_address, formData.temporary_address, formData.discp_cases,
             formData.discp_remarks, formData.probation_period, formData.confirmed_date,
-            formData.ltc_ta_da, formData.toa_sos_in_mceme, formData.pay_level, formData.basic_pay
+            formData.ltc_ta_da, formData.toa_sos_in_mceme, formData.pay_level, formData.basic_pay,
+            formData.retirement,formData.retirement_type
         ];
 
         // Execute query to update the employee

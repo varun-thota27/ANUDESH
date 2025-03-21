@@ -190,6 +190,8 @@ const UpdateRegistration = ({onBack}) => {
             date_of_birth: null,  // Use null for date values
             date_of_appointment: null,
             date_of_retirement: null,
+            retirement: '',
+            retirement_type :'',
             mode_of_appointment: '',
             fr56j: '',
             employee_group: '',
@@ -208,7 +210,7 @@ const UpdateRegistration = ({onBack}) => {
             ifsc_code: '',
             court_case: false,  // Boolean instead of 'no'
             court_name: '',
-            audit: false,
+            audit: '',
             date_of_audit: null,
             penalty: false,
             penalty_remarks: '',
@@ -368,6 +370,8 @@ const UpdateRegistration = ({onBack}) => {
                 date_of_birth: '',
                 date_of_appointment: '',
                 date_of_retirement: '',
+                retirement: 'no',
+                retirement_type :'',
                 mode_of_appointment: '',
                 fr56j: '',
                 employee_group: '',
@@ -599,6 +603,29 @@ const UpdateRegistration = ({onBack}) => {
                             <input type="date" name="date_of_retirement" value={formData.date_of_retirement} onChange={handleChange}/>
                         </div>
                         
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>Retirement</label>
+                            <select name="retirement" value={formData.retirement} onChange={handleChange}>
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                        {formData.retirement === 'yes' && (
+                            <div className="form-group">
+                                <label>Retirement type</label>
+                                <select name="retirement_type" value={formData.retirement_type} onChange={handleChange} >
+                                <option value="Death">Death</option>
+                                <option value="Removal from Service">Removal from Service</option>
+                                <option value="Superannuation">Superannuation</option>
+                                <option value="Voluntary">Voluntary</option>
+                                <option value="Premature">Premature</option>
+                                <option value="Medically Boarded">Medically Boarded</option>
+                                </select>
+                            </div>
+                        )}
                     </div>
 
                     {/* New Personal Details */}
@@ -912,7 +939,7 @@ const UpdateRegistration = ({onBack}) => {
                         </div>
                         <div className="form-group">
                             <label>Pay Level</label>
-                            <select name="pay_level" value={formData.pay_level || ""} onChange={handleChange}>
+                            <select name="pay_level" value={(formData.pay_level) ||  ""} onChange={handleChange}>
                                 {[...Array(9)].map((_, i) => (
                             <option key={i + 1} value={i + 1}>{i + 1}</option>
                                 ))}

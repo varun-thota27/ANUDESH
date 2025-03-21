@@ -17,13 +17,13 @@ export const createEmployee = async (req, res) => {
                 audit_,date_of_audit,penalty, penalty_remarks, mobile_no, email_id, uid_no, macp, 
                 promotion, permanent_address, temporary_address, discp_cases, 
                 discp_remarks, probation_period, confirmed_date, ltc_ta_da, 
-                toa_sos_in_mceme, pay_level, basic_pay
+                toa_sos_in_mceme, pay_level, basic_pay,retirement,retirement_type
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
                 TO_DATE($13, 'YYYY-MM-DD'),TO_DATE($14, 'YYYY-MM-DD'),TO_DATE($15, 'YYYY-MM-DD'),
                 $16,$17,$18,$19,$20,$21,$50,$22,$23,$24,TO_DATE($25, 'YYYY-MM-DD'),
                 $26,$27,$28,$29,$30,$31,$32,$51,TO_DATE($52, 'YYYY-MM-DD'),$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,
-                TO_DATE($45, 'YYYY-MM-DD'),$46,$47,$48,$49
+                TO_DATE($45, 'YYYY-MM-DD'),$46,$47,$48,$49,$53,$54
             ) RETURNING gpf_pran`;
 
         // Ensure all the necessary values are passed
@@ -42,7 +42,7 @@ export const createEmployee = async (req, res) => {
             formData.temporaryAddress, formData.discpCases, formData.discpRemarks,
             formData.probationPeriod, formData.confirmedDate, formData.ltcTaDa,
             formData.toaSosInMceme, formData.payLevel, formData.basicPay,formData.cat, formData.audit,
-            formData.dateofaudit
+            formData.dateofaudit,formData.retirement,formData.retirement_type
         ];
 
         // Execute query to insert the employee

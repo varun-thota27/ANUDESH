@@ -196,6 +196,10 @@ const ViewRegistration = ({ onBack }) => {
                     <span>${formatDate(employeeData.date_of_retirement) || '-'}</span>
                   </div>
                   <div class="print-row">
+                    <label>Retirement Type:</label>
+                    <span>${employeeData.retirement_type || '-'}</span>
+                  </div>
+                  <div class="print-row">
                     <label>Mode of Appointment:</label>
                     <span>${employeeData.mode_of_appointment || '-'}</span>
                   </div>
@@ -499,6 +503,10 @@ const ViewRegistration = ({ onBack }) => {
                 <div className="print-row">
                   <label>Date of Retirement:</label>
                   <span>{formatDate(employeeData.date_of_retirement)}</span>
+                </div>
+                <div className="print-row">
+                  <label>Retirement Type:</label>
+                  <span>{employeeData.retirement_type || '-'}</span>
                 </div>
                 <div className="print-row">
                   <label>Mode of Appointment:</label>

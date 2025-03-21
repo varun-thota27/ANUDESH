@@ -40,6 +40,8 @@ const Registration = () => {
         dateOfBirth: '',
         dateOfAppointment: '',
         dateOfRetirement: '',
+        retirement: 'no',
+        retirement_type :'',
         modeOfAppointment: '',
         fr56j: '',
         group: '',
@@ -286,6 +288,8 @@ const Registration = () => {
                 dateOfBirth: '',
                 dateOfAppointment: '',
                 dateOfRetirement: '',
+                retirement: 'no',
+                retirement_type :'',
                 modeOfAppointment: '',
                 fr56j: '',
                 group: '',
@@ -514,6 +518,29 @@ const Registration = () => {
                         </div>
                     </div>
 
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>Retirement</label>
+                            <select name="retirement" value={formData.retirement} onChange={handleChange}>
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                        {formData.retirement === 'yes' && (
+                            <div className="form-group">
+                                <label>Retirement type</label>
+                                <select name="retirement_type" value={formData.retirement_type} onChange={handleChange} >
+                                <option value="Death">Death</option>
+                                <option value="Removal from Service">Removal from Service</option>
+                                <option value="Superannuation">Superannuation</option>
+                                <option value="Voluntary">Voluntary</option>
+                                <option value="Premature">Premature</option>
+                                <option value="Medically Boarded">Medically Boarded</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
                     {/* New Personal Details */}
                     <div className="form-row">
                         <div className="form-group">
@@ -635,51 +662,18 @@ const Registration = () => {
                         </div>
                     </div>
 
-                    <div className="form-section">
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Audit</label>
-                                <select name="audit" value={formData.audit} onChange={handleChange}>
-                                    <option value="no">No</option>
-                                    <option value="yes">Yes</option>
-                                </select>
-                            </div>
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>Audit</label>
+                            <select name="audit" value={formData.audit} onChange={handleChange}>
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
                         </div>
                         {formData.audit === 'yes' && (
-                            <div className="promotions-container">
-                                {formData.audit.map((audit, index) => (
-                                    <div key={index} className="dynamic-row">
-                                        <div className="form-row">
-                                            <div className="form-group">
-                                                <label>Audit No.</label>
-                                                <input
-                                                    type="text"
-                                                    value={audit.nam}
-                                                    onChange={(e) => handlePromotionChange(index, 'name', e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="form-group">
-                                                <label>Date of Promotion</label>
-                                                <input
-                                                    type="date"
-                                                    value={promotion.date}
-                                                    onChange={(e) => handlePromotionChange(index, 'date', e.target.value)}
-                                                />
-                                            </div>
-                                            <button 
-                                                type="button" 
-                                                className="delete-button"
-                                                onClick={() => handlePromotionDelete(index)}
-                                                title="Delete"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                                <button type="button" onClick={handlePromotionAdd} className="add-button">
-                                    Add Audit Date
-                                </button>
+                            <div className="form-group">
+                                <label>Date of Audit</label>
+                                <input type="date" name="dateofaudit" value={formData.dateofaudit} onChange={handleChange} />
                             </div>
                         )}
                     </div>
