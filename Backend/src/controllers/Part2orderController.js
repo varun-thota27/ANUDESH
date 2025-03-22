@@ -1,6 +1,6 @@
 import pool from "../db.js";
 
-const leaveController = {
+const part2orderController = {
   fetchLeaveRecords: async (req, res) => {
     try {
       const { army_no, fromDate, toDate, leave_type } = req.query;
@@ -57,4 +57,4 @@ const leaveController = {
 };
 
 
-export default leaveController;
+export default part2orderController;

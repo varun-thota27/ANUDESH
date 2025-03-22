@@ -6,6 +6,8 @@ import "./Fetch.css";
 function NavBar() {
 
   const [showLeaveDropdown, setShowLeaveDropdown] = useState(false);
+  const [showPartIIDropdown, setShowPartIIDropdown] = useState(false);
+  const [showUsersDropdown, setShowUsersDropdown] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const navigate = useNavigate();
 
@@ -29,6 +31,7 @@ function NavBar() {
       <div className="menu-logo">
           <img src="/image.png" alt="Logo" />
         </div>
+      {/* Logo Section */}
 
       {/* Navigation Buttons */}
       <button onClick={() => navigate("/registration")}>Registration</button>
@@ -40,7 +43,7 @@ function NavBar() {
         className="leave-dropdown-container"
         onMouseEnter={() => setShowLeaveDropdown(true)}
         onMouseLeave={() => setShowLeaveDropdown(false)}
-      >
+      > 
         <button
           className={`leave-button ${showLeaveDropdown ? "active" : ""}`}
           onClick={() => setShowLeaveDropdown(!showLeaveDropdown)}
@@ -58,6 +61,62 @@ function NavBar() {
           </div>
         )}
       </div>
+
+
+  {/* Part-II Order Dropdown */}
+  <div
+        className="leave-dropdown-container"
+        onMouseEnter={() => setShowPartIIDropdown(true)}
+        onMouseLeave={() => setShowPartIIDropdown(false)}
+      >
+        <button
+          className={`leave-button ${showPartIIDropdown ? "active" : ""}`}
+          onClick={() => setShowPartIIDropdown(!showPartIIDropdown)}
+        >
+          Part-II Order
+        </button>
+        {showPartIIDropdown && (
+          <div className="leave-dropdown-menu">
+            <button onClick={() => navigate("/kinderedroll")}>
+              Kindered Roll
+            </button>
+            <button onClick={() => navigate("/marital-status")}>
+              Marital Status
+            </button>
+            <button onClick={() => navigate("/retired")}>
+              Retirements
+            </button>
+            <button onClick={() => navigate("/status")}>
+              Status
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Users Dropdown */}
+      <div
+        className="leave-dropdown-container"
+        onMouseEnter={() => setShowUsersDropdown(true)}
+        onMouseLeave={() => setShowUsersDropdown(false)}
+      >
+        <button
+          className={`leave-button ${showUsersDropdown ? "active" : ""}`}
+          onClick={() => setShowUsersDropdown(!showUsersDropdown)}
+        >
+          Users
+        </button>
+        {showUsersDropdown && (
+          <div className="leave-dropdown-menu">
+            <button onClick={() => navigate("/newusers")}>
+              New Users
+            </button>
+            <button onClick={() => navigate("/users")}>
+              Users List
+            </button>
+          </div>
+        )}
+      </div>
+
       <button onClick={() => navigate("/manpower")}>ManPower</button>
 
       {/* Logout Button */}

@@ -17,14 +17,18 @@
   font-weight: normal;
 }
 
-.login-container {
+.login-container, .signup-container {
+  display: none;
   width: 400px;
   margin: 50px auto;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  align-items: center;
+}
+
+.show {
+  display: block;
 }
 
 .form-group {
@@ -78,26 +82,28 @@ h2 {
     transition: opacity 0.5s ease;
 }
 
-.container {
+.button-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* Centers content vertically */
+  justify-content: space-between;
+  width: 95%;
+  margin: 10px auto;
 }
 
-.logo-container {
-  margin-right: 20px; /* Adds spacing between logo and form */
+.button-container button {
+  width: 48%;
+  margin-top: 0;
 }
 
-.logo-container img {
-  max-width: 150px; /* Adjust size as needed */
-  height: auto;
+.faculty-select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
 }
 
-.login-container {
-  width: 400px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.faculty-select:focus {
+  outline: none;
+  border-color: #4CAF50;
 }
