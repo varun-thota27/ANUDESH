@@ -1,10 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useRef} from "react";
 import { useNavigate } from "react-router-dom";
 import manPowerService from '../services/manPowerService';
 import NavBar from './NavBar';
 import './manPower.css';
+import {FaArrowLeft,FaArrowRight} from "react-icons/fa";
 
+
+ 
+const useTableScroll = () => {
+  const tablesContainerRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (tablesContainerRef.current) {
+      tablesContainerRef.current.scrollBy({
+        left: -tablesContainerRef.current.clientWidth,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (tablesContainerRef.current) {
+      tablesContainerRef.current.scrollBy({
+        left: tablesContainerRef.current.clientWidth,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  return { tablesContainerRef, scrollLeft, scrollRight };
+};
 const ManPower = () => {
+
+  const { tablesContainerRef, scrollLeft, scrollRight } = useTableScroll();
   const [category, setCategory] = useState([]);
   const [categoryWing, setCategoryWing] = useState([]);
   const [NonIndCentral, setNonIndCentral] = useState([]);
@@ -212,120 +240,166 @@ const ManPower = () => {
   return (
     <div>
       <NavBar />
-    <div className="manpower-container">
-    <div className="button-container">
-  <button className="print-button5" onClick={handlePrint}>Print Tables</button>
-  <button className="info-button5" onClick={handleNavigate}>Trade Info</button>
-</div>
-      <div className="tables-container">
-        <div className="table-wrapper">
-          <h3>MANPOWER STATE : CIV</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Cat</th>
-                <th>Auth as per PE</th>
-                <th>Auth as per UPP</th>
-                <th>Held</th>
-                <th>Defi/Sur</th>
-                <th>Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-            {category.map((app, index) => (
-                <tr key={index}>
-                  <td>{app.cat}</td>
-                  <td contentEditable="true">{app.sum}</td>
-                  <td>--</td>
-                  <td contentEditable="true">{app.held}</td>
-                  <td>(-) {(Number(app.sum,10)||0)-(Number(app.defi,10)||0)}</td>
-                  <td contentEditable="true"></td>
-                </tr>
-              ))}
-              <tr>
-              <td><b>Total</b></td>
-              <td><b>{totals.auth}</b></td>
-              <td><b>--</b></td>
-              <td><b>{totals.held}</b></td>
-              <td><b>{totals.defi}</b></td>
-              <td></td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="manpower-container">
+        <div className="button-container">
+      <button className="print-button5" onClick={handlePrint}>Print Tables</button>
+      <button className="info-button5" onClick={handleNavigate}>Trade Info</button>
+      </div>
+      <div className="scroll-buttons">
+        <div 
+          className="arrow-button" 
+          onClick={scrollLeft} 
+          style={{ 
+            position: 'fixed',
+            left: '20px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            width: '50px',
+            height: '50px',
+            backgroundColor: '#173B45',
+            borderRadius: '50%',
+            color: 'white',
+            cursor: 'pointer',
+            zIndex: 1000
+          }}
+        >
+          <FaArrowLeft/> {/* Left Arrow */}
         </div>
+        <div 
+          className="arrow-button" 
+          onClick={scrollRight} 
+          style={{ 
+            position: 'fixed',
+            right: '20px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            display: 'flex',
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            width: '50px',
+            height: '50px',
+            backgroundColor: '#173B45',
+            borderRadius: '50%',
+            color: 'white',
+            cursor: 'pointer',
+            zIndex: 1000
+          }}
+        >
+          <FaArrowRight/> {/* Right Arrow */}
+        </div>
+      </div>
+      <div className="tables-container5" ref={tablesContainerRef}>
+          <div className="table-wrapper">
+            <h3>MANPOWER STATE : CIV</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Cat</th>
+                  <th>Auth as per PE</th>
+                  <th>Auth as per UPP</th>
+                  <th>Held</th>
+                  <th>Defi/Sur</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+              {category.map((app, index) => (
+                  <tr key={index}>
+                    <td>{app.cat}</td>
+                    <td contentEditable="true">{app.sum}</td>
+                    <td>--</td>
+                    <td contentEditable="true">{app.held}</td>
+                    <td>(-) {(Number(app.sum,10)||0)-(Number(app.defi,10)||0)}</td>
+                    <td contentEditable="true"></td>
+                  </tr>
+                ))}
+                <tr>
+                <td><b>Total</b></td>
+                <td><b>{totals.auth}</b></td>
+                <td><b>--</b></td>
+                <td><b>{totals.held}</b></td>
+                <td><b>{totals.defi}</b></td>
+                <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-        {/* Table 2: MANPOWER SUMMARY STATE : CIV DEF EMP */}
-        <div className="table-wrapper">
-          <h3>MANPOWER SUMMARY STATE : CIV DEF EMP</h3>
-          <table>
-          <thead>
-        <tr>
-          <th rowSpan="2">Cat</th>
-          {faculties.map((faculty) => (
-            <th colSpan="2" key={faculty}>{faculty}</th>
-          ))}
-          <th colSpan="2">TOTAL</th>
+          {/* Table 2: MANPOWER SUMMARY STATE : CIV DEF EMP */}
+          <div className="table-wrapper">
+            <h3>MANPOWER SUMMARY STATE : CIV DEF EMP</h3>
+            <table>
+            <thead>
+          <tr>
+            <th rowSpan="2">Cat</th>
+            {faculties.map((faculty) => (
+              <th colSpan="2" key={faculty}>{faculty}</th>
+            ))}
+            <th colSpan="2">TOTAL</th>
+          </tr>
+          <tr>
+            {faculties.map(() => (
+              <>
+                <th>A</th>
+                <th>H</th>
+              </>
+            ))}
+            <th>A</th>
+            <th>H</th>
+          </tr>
+        </thead>
+        <tbody>
+    {Object.entries(categoryWing)
+      .sort(([a], [b]) => {
+        if (a === "Total") return 1; // Move TOTAL to the bottom
+        if (b === "Total") return -1;
+        return b.localeCompare(a); // Sort remaining categories in descending order
+      })
+      .map(([category, values]) => (
+        <tr key={category}>
+          <td>{category}</td>
+          {faculties.map((faculty) => {
+            const facultyData = values.find((item) => item.faculty === faculty) || { auth: 0, employee_count: 0 };
+            return (
+              <React.Fragment key={faculty}>
+                <td>{facultyData.auth}</td>
+                <td>{facultyData.employee_count}</td>
+              </React.Fragment>
+            );
+          })}
+          <td>{values.reduce((sum, item) => sum + Number(item.auth || 0), 0)}</td>
+          <td>{values.reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</td>
         </tr>
-        <tr>
-          {faculties.map(() => (
-            <>
-              <th>A</th>
-              <th>H</th>
-            </>
-          ))}
-          <th>A</th>
-          <th>H</th>
-        </tr>
-      </thead>
-      <tbody>
-  {Object.entries(categoryWing)
-    .sort(([a], [b]) => {
-      if (a === "Total") return 1; // Move TOTAL to the bottom
-      if (b === "Total") return -1;
-      return b.localeCompare(a); // Sort remaining categories in descending order
-    })
-    .map(([category, values]) => (
-      <tr key={category}>
-        <td>{category}</td>
+      ))}
+
+      {/* TOTAL ROW */}
+      <tr>
+        <td><b>Total</b></td>
         {faculties.map((faculty) => {
-          const facultyData = values.find((item) => item.faculty === faculty) || { auth: 0, employee_count: 0 };
+          const total = Object.values(categoryWing).flat().reduce(
+            (acc, row) => {
+              if (row.faculty === faculty) {
+                acc.auth += Number(row.auth || 0);
+                acc.held += Number(row.employee_count || 0);
+              }
+              return acc;
+            },
+            { auth: 0, held: 0 }
+          );
           return (
             <React.Fragment key={faculty}>
-              <td>{facultyData.auth}</td>
-              <td>{facultyData.employee_count}</td>
+              <td><b>{total.auth}</b></td>
+              <td><b>{total.held}</b></td>
             </React.Fragment>
           );
         })}
-        <td>{values.reduce((sum, item) => sum + Number(item.auth || 0), 0)}</td>
-        <td>{values.reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</td>
+        <td><b>{Object.values(categoryWing).flat().reduce((sum, item) => sum + Number(item.auth || 0), 0)}</b></td>
+        <td><b>{Object.values(categoryWing).flat().reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</b></td>
       </tr>
-    ))}
-
-  {/* TOTAL ROW */}
-  <tr>
-    <td><b>Total</b></td>
-    {faculties.map((faculty) => {
-      const total = Object.values(categoryWing).flat().reduce(
-        (acc, row) => {
-          if (row.faculty === faculty) {
-            acc.auth += Number(row.auth || 0);
-            acc.held += Number(row.employee_count || 0);
-          }
-          return acc;
-        },
-        { auth: 0, held: 0 }
-      );
-      return (
-        <React.Fragment key={faculty}>
-          <td><b>{total.auth}</b></td>
-          <td><b>{total.held}</b></td>
-        </React.Fragment>
-      );
-    })}
-    <td><b>{Object.values(categoryWing).flat().reduce((sum, item) => sum + Number(item.auth || 0), 0)}</b></td>
-    <td><b>{Object.values(categoryWing).flat().reduce((sum, item) => sum + Number(item.employee_count || 0), 0)}</b></td>
-  </tr>
-</tbody>
+    </tbody>
 
     </table>
         </div>
@@ -645,7 +719,7 @@ const ManPower = () => {
         </div>
       </div>
     </div>
-    </div>
+  </div>
   );
 };
 

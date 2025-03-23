@@ -23,12 +23,12 @@
 .button-container {
   display: flex;
   justify-content: flex-end; /* Aligns buttons to the right */
-  gap: 10px; /* Adds spacing between buttons */
-  padding-right: 20px; /* Adjust spacing from the right */
-}
+   gap: 10px; /*Adds spacing between buttons */
+   padding-right: 20px; /*Adjust spacing from the right */
+ } 
 
 .info-button5 {
-  margin: 20px;
+  margin: 50px;
   padding: 10px 20px;
   height: 50px;
   width: 150px;
@@ -38,8 +38,8 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  display: block; /* Ensures it takes full width available */
-  margin-left: auto; /* Pushes the button to the right */
+   display: block; /*Ensures it takes full width available */
+   margin-left: auto; /*Pushes the button to the right */
 }
 
 .info-button5:hover {
@@ -47,22 +47,29 @@
 }
 
 
-.tables-container {
+.tables-container5 {
   display: flex;
   overflow-x: auto;
   gap: 20px;
   padding-bottom: 20px;
+  margin-left: 60px;
+  margin-right: 60px;
   scroll-snap-type: x mandatory;
 }
 
 .table-wrapper {
   flex: 0 0 auto;
   min-width: 500px;
+  margin-left: 30px;
+  margin-right: 30px;
   background: white;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   scroll-snap-align: start;
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 10px;
 }
 
 .table-wrapper h3 {
@@ -116,7 +123,7 @@ tr:hover {
     display: none !important;
   }
 
-  .tables-container {
+  .tables-container5 {
     display: block !important;
     overflow: visible !important;
     padding: 0 !important;

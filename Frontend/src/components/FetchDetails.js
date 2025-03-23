@@ -383,7 +383,7 @@ function FetchDetails() {
                 <i className="fas fa-print"></i> <FaPrint/> Print
               </button>
             </div>
-            <div className="table-wrapper">
+            <div className="table-wrapper-fetch">
               {filteredData.length > 0 ? (
                 <table className="details-table">
                   <thead>
