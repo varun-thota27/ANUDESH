@@ -209,7 +209,7 @@ function UserFetchDetails() {
                 <i className="fas fa-print"></i> Print
               </button>
             </div>
-            <div className="table-wrapper">
+            <div className="table-wrapper-fetch">
               {filteredData.length > 0 ? (
                 <table className="details-table">
                   <thead>

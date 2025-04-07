@@ -16,7 +16,7 @@ const kinderedRollController = {
       );
       const currentYear = new Date().getFullYear();
       const count = parseInt(countResult.rows[0].count) + 1;
-      const pot_no = `${count}-${currentYear}`;
+      const pot_no = `${count}-${"CIV"}-${currentYear}`;
 
       // Determine the type based on presence of spouse or child details
       const requestType = spouseName ? 'MARTIAL' : (childName ? 'KINDERED' : 'REQUEST');

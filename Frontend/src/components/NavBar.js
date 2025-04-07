@@ -86,6 +86,9 @@ function NavBar() {
             <button onClick={() => navigate("/retired")}>
               Retirements
             </button>
+            <button onClick={() => navigate("/part2order")}>
+              Leave
+           </button>
             <button onClick={() => navigate("/status")}>
               Status
             </button>

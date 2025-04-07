@@ -399,7 +399,7 @@ const ViewRegistration = ({ onBack }) => {
           <div className="print-column">
             <div className="print-box">
               <h3>Basic Information</h3>
-              <div className="print-content">
+              <div >
                 <div className="print-row">
                   <label>Command:</label>
                   <span>{employeeData.command}</span>
@@ -429,7 +429,7 @@ const ViewRegistration = ({ onBack }) => {
 
             <div className="print-box">
               <h3>Personal Information</h3>
-              <div className="print-content">
+              <div >
                 <div className="print-row">
                   <label>First Name:</label>
                   <span>{employeeData.first_name}</span>
@@ -467,7 +467,7 @@ const ViewRegistration = ({ onBack }) => {
 
             <div className="print-box">
               <h3>Contact Information</h3>
-              <div className="print-content">
+              <div>
                 <div className="print-row">
                   <label>Mobile Number:</label>
                   <span>{employeeData.mobile_no}</span>
@@ -491,7 +491,7 @@ const ViewRegistration = ({ onBack }) => {
           <div className="print-column">
             <div className="print-box">
               <h3>Service Information</h3>
-              <div className="print-content">
+              <div >
                 <div className="print-row">
                   <label>Date of Birth:</label>
                   <span>{formatDate(employeeData.date_of_birth)}</span>
@@ -529,7 +529,7 @@ const ViewRegistration = ({ onBack }) => {
 
             <div className="print-box">
               <h3>Identification Details</h3>
-              <div className="print-content">
+              <div >
                 <div className="print-row">
                   <label>PAN Number:</label>
                   <span>{employeeData.pan_number}</span>
@@ -547,7 +547,7 @@ const ViewRegistration = ({ onBack }) => {
 
             <div className="print-box">
               <h3>Bank Details</h3>
-              <div className="print-content">
+              <div >
                 <div className="print-row">
                   <label>Bank Name:</label>
                   <span>{employeeData.bank_name}</span>

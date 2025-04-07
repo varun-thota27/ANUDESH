@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './LeaveManagement.css';
 import NavBar from './NavBar';
-import part2orderService from '../services/partr2orderService';
+import part2orderService from '../services/part2orderService';
 
 const LeaveRecord = () => {
   const [searchArmyNo, setSearchArmyNo] = useState('');

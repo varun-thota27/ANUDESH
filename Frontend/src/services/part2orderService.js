@@ -10,7 +10,7 @@ const part2orderService = {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });
-  
+     console.log("hi")
       console.log("API Response:", response.data);
       return response.data;
     } catch (error) {

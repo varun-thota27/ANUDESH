@@ -24,6 +24,7 @@ import Retirements from "./components/Retirement";
 import Status from "./components/status";
 import NewUsers from "./components/NewUsers";
 import UserList from "./components/userlist";
+import Part2order1 from "./components/LeavePartII";
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
         <Route path="/status" element={<Status />} />
         <Route path="/newusers" element={<NewUsers />} />
         <Route path="/users" element={<UserList />} /> 
+        <Route path="/part2order" element={<Part2order1 />} />
       </Routes>
     </div>
   );

@@ -222,7 +222,7 @@ const Registration = () => {
         const uidRegex = /^[0-9]{12}$/;
         const basicPayRegex = /^[0-9]+$/;
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const accountNumberRegex = /^[0-9]{12}$/;
+        const accountNumberRegex = /^[0-9]{11}$/;
 
         if (!panRegex.test(panNumber)) {
             alert('PAN Number must be 10 alphanumeric characters.');

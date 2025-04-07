@@ -44,7 +44,7 @@ const part2orderController = {
         params.push(leave_type);
       }
   
-      query += ` ORDER BY lh.from_date DESC;`;
+      query += ` ORDER BY lh.from_date DESC;`
   
       const { rows } = await pool.query(query, params);
   

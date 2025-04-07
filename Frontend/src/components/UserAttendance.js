@@ -103,7 +103,7 @@ function UserAttendance({userFaculty}) {
               </div>
             </div>
           </div>
-          <div className="table-wrapper">
+          <div className="table-wrapper-att">
             {attendanceData.members.length > 0 ? (
               <table className="attendance-table">
                 <thead>

@@ -1,11 +1,10 @@
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "http://localhost:5000/api/auth"; // Changed from :5000
 
 const authService = {
   login: async (username, password, role, faculty) => {
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       credentials: "include",
-      withCredentials:true,
       headers: { 
         "Content-Type": "application/json",
       },

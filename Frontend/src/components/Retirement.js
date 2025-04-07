@@ -43,6 +43,7 @@ const Retirement = () => {
   };
 
   const handlePrint = () => {
+    // Add any specific print preparation if needed
     window.print();
   };
 
@@ -181,57 +182,50 @@ const Retirement = () => {
 
         {/* Hidden print content */}
         <div className="print-content">
-          <div className="print-header">
-            <div className="org-details">
-              MCEME<br />
-              PIN 900453<br />
-              C/O 56 APO
-            </div>
-            <div className="doc-title">
-              RESTRICTED<br />
-              DAILY ORDERS PART II
-            </div>
-            <div className="page-details">
-              Page: 01 & Last<br />
-              No: 01/CW/{selectedYear}<br />
-              Dated: {formattedDate}
-            </div>
-            <div className="last-do">
-              LAST DO PART II NO: 193/CW/2024 DT 31 DEC 2024
-            </div>
+          <div className="doc-header">
+            <div className="restricted-text">RESTRICTED</div>
+            <div className="daily-orders">DAILY ORDERS PART II</div>
           </div>
 
-          <div className="print-body">
-            <h2>RETIREMENT CIVILIANS:</h2>
-            <p className="retirement-description">
-              The under mentioned civilian personnel on attaining the age of superannuation i.e., 60 years will retire from service on the date shown against each:-
-            </p>
+          <div className="header-info">
+            <div className="left-info">MCEME</div>
+            <div className="right-info">Date: {formattedDate}</div>
+          </div>
+          
+          <hr className="header-line" />
 
-            <div className="section">
-              <h3>{getTableTitle()}</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Ser</th>
-                    <th>No. Rank & Name</th>
-                    <th>Date of Birth</th>
-                    <th>Date of Appt</th>
-                    <th>Date of Ret</th>
+          <div className="title-section">
+            <h2 className="retirement-heading">RETIREMENT OF CIVILIANS</h2>
+            <h3 className="retirement-subheading">{getTableTitle()}</h3>
+          </div>
+          
+          <div className="table-wrapper">
+            <table className="retirement-table">
+              <thead>
+                <tr>
+                  <th>Ser</th>
+                  <th>Service No.</th>
+                  <th>Name</th>
+                  <th>Rank</th>
+                  <th>Date of Birth</th>
+                  <th>Date of Appt</th>
+                  <th>Date of Ret</th>
+                </tr>
+              </thead>
+              <tbody>
+                {retirementData.map((employee, index) => (
+                  <tr key={employee._id}>
+                    <td>{index + 1}</td>
+                    <td>{employee.army_no}</td>
+                    <td>{employee.first_name}</td>
+                    <td>{employee.designation}</td>
+                    <td>{formatDate(new Date(employee.date_of_birth))}</td>
+                    <td>{formatDate(new Date(employee.date_of_appointment))}</td>
+                    <td>{formatDate(new Date(employee.date_of_retirement))}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {retirementData.map((employee, index) => (
-                    <tr key={employee._id}>
-                      <td>{index + 1}</td>
-                      <td>{employee.army_no}</td>
-                      <td>{formatDate(new Date(employee.date_of_birth))}</td>
-                      <td>{formatDate(new Date(employee.date_of_appointment))}</td>
-                      <td>{formatDate(new Date(employee.date_of_retirement))}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </>

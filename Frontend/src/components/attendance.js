@@ -257,7 +257,7 @@ function Attendance() {
                 <FaPrint /> Print
               </button>
             </div>
-            <div className="table-wrapper">
+            <div className="table-wrapper-att">
               {mainTableData.length > 0 ? (
                 <table className="attendance-table">
                   <thead>
@@ -322,7 +322,7 @@ function Attendance() {
                 </button>
               </div>
             </div>
-            <div className="table-wrapper">
+            <div className="table-wrapper-att">
                           {membersData.filter(m => m.dept_name === selectedFac).length > 0 ? (
                 <table className="attendance-table">
                   <thead>

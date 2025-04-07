@@ -292,41 +292,41 @@ const ManPower = () => {
         </div>
       </div>
       <div className="tables-container5" ref={tablesContainerRef}>
-          <div className="table-wrapper">
-            <h3>MANPOWER STATE : CIV</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Cat</th>
-                  <th>Auth as per PE</th>
-                  <th>Auth as per UPP</th>
-                  <th>Held</th>
-                  <th>Defi/Sur</th>
-                  <th>Remarks</th>
+      <div className="table-wrapper">
+          <h3>MANPOWER STATE : CIV</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Cat</th>
+                <th>Auth as per PE</th>
+                <th>Auth as per UPP</th>
+                <th>Held</th>
+                <th>Defi/Sur</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+            {category.map((app, index) => (
+                <tr key={index}>
+                  <td>{app.cat}</td>
+                  <td contentEditable="true">{app.sum}</td>
+                  <td>--</td>
+                  <td contentEditable="true">{app.held}</td>
+                  <td>(-) {(Number(app.sum,10)||0)-(Number(app.held,10)||0)}</td>
+                  <td contentEditable="true"></td>
                 </tr>
-              </thead>
-              <tbody>
-              {category.map((app, index) => (
-                  <tr key={index}>
-                    <td>{app.cat}</td>
-                    <td contentEditable="true">{app.sum}</td>
-                    <td>--</td>
-                    <td contentEditable="true">{app.held}</td>
-                    <td>(-) {(Number(app.sum,10)||0)-(Number(app.defi,10)||0)}</td>
-                    <td contentEditable="true"></td>
-                  </tr>
-                ))}
-                <tr>
-                <td><b>Total</b></td>
-                <td><b>{totals.auth}</b></td>
-                <td><b>--</b></td>
-                <td><b>{totals.held}</b></td>
-                <td><b>{totals.defi}</b></td>
-                <td></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              ))}
+              <tr>
+              <td><b>Total</b></td>
+              <td><b>{totals.auth}</b></td>
+              <td><b>--</b></td>
+              <td><b>{totals.held}</b></td>
+              <td><b>{(Number(totals.auth,10)||0)-(Number(totals.held,10)||0)}</b></td>
+              <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
           {/* Table 2: MANPOWER SUMMARY STATE : CIV DEF EMP */}
           <div className="table-wrapper">

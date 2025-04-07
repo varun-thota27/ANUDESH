@@ -21,7 +21,7 @@ const leaveController = {
         let result;
         if (role !== 'admin') {
             result = await pool.query(
-                `SELECT e.army_no, e.first_name, e.middle_name, e.last_name, 
+                `SELECT distinct e.army_no, e.first_name, e.middle_name, e.last_name, 
                  e.designation, e.faculty 
                  FROM employees e 
                  JOIN faculty_wing f ON e.faculty=f.wing 
@@ -30,7 +30,7 @@ const leaveController = {
             );
         } else {
             result = await pool.query(
-                `SELECT army_no, first_name, middle_name, last_name, designation, faculty FROM employees`
+                `SELECT distinct army_no, first_name, middle_name, last_name, designation, faculty FROM employees`
             ); // Admin gets all employees
         }
 
@@ -313,7 +313,7 @@ const leaveController = {
   
       if (role !== 'admin') {
         result = await pool.query(`
-          SELECT e.army_no as army_no, e.first_name, e.middle_name, e.last_name, e.designation, 
+          SELECT distinct e.army_no as army_no, e.first_name, e.middle_name, e.last_name, e.designation, 
                  e.faculty, l.leave_type, l.status,l.from_date,l.to_date,l.no_of_days,l.recommendation_date,
                  l.address_on_leave,l.reason_for_leave,l.approval_date,l.is_extended
           FROM employees e 
@@ -330,7 +330,7 @@ const leaveController = {
   fetchAtAdmin : async(req,res) => {
     try {
       const leaveQuery = `
-        SELECT 
+        SELECT distinct
         lh.army_no, e.first_name, e.middle_name, e.last_name, e.designation, e.faculty, lh.leave_type, 
          lh.status
       FROM leave_history lh
@@ -466,7 +466,7 @@ FROM pending_leaves pl;
 
       if(decision === "APPROVED")
       {
-        const query1 = `SELECT from_date,to_date from leave_history where leave_id =$1`;
+        const query1 = `SELECT distinct from_date,to_date from leave_history where leave_id =$1`;
         const result=await pool.query(query1, [id]);
         const fromDate= result.rows[0].from_date;
         const toDate = result.rows[0].to_date;
@@ -494,7 +494,7 @@ fetchRecords: async (req, res) => {
 
     // SQL Query to fetch leave records along with employee name
     let query = `
-      SELECT 
+      SELECT distinct
         lh.from_date, 
         lh.to_date, 
         lh.leave_type, 
