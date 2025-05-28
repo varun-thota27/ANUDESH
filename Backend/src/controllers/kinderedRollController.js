@@ -142,6 +142,24 @@ const kinderedRollController = {
           `DELETE FROM pto_kid WHERE pot_no = $1`,
           [id]
         );
+      }else if (status === 'Approved') {
+        const detailResult = await client.query(
+          'SELECT * FROM pto_kid WHERE pot_no = $1',
+          [id]
+        );
+        if (detailResult.rows.length > 0) {
+          const detail = detailResult.rows[0];
+          const army_number=detail.army_number;
+          const name = detail.child_name || detail.spousename || null;
+          const dob = detail.date_of_birth || detail.marriage_date || null;
+          const relationship = detail.child_relation || (detail.spousename ? 'Spouse' : null);
+  
+          await client.query(
+            `INSERT INTO family_members (army_number, name, dob, relationship)
+             VALUES ($1, $2, $3, $4)`,
+            [army_number, name, dob, relationship]
+          );
+        }
       }
 
       await client.query('COMMIT');

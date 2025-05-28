@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/man-power";
+const API_URL = `${process.env.REACT_APP_API_URL}/man-power`;
 
 const manPowerService = {
   fetchCategory: async () => {

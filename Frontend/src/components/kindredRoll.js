@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import NavBar from "./NavBar";
 import "./kindredRoll.css";
+import infoService from '../services/infoService';
 import kinderedRollService from "../services/kinderedRollService";
 
 const KinderedRoll = () => {
@@ -21,8 +22,20 @@ const KinderedRoll = () => {
     placeOfRegistration: "",
   });
 
-  const trades = ["A", "B", "C"];
-  const categories = ['Ind','Non-Ind'];
+  const [trades, setTrade] = useState([]);
+
+    useEffect(() => {
+        const fetchTrades = async () => {
+          try {
+            const data = await infoService.trade(); // Fetch faculty list from API
+            setTrade(data);
+          } catch (error) {
+            console.error("Error fetching faculties:", error);
+          }
+        };
+    
+        fetchTrades();
+      }, []);
   const relations = ["Son", "Daughter"];
   const proofTypes = ["Birth Certificate", "Aadhar Card", "School Certificate"];
 
@@ -135,19 +148,14 @@ const KinderedRoll = () => {
 
             <div className="kindered-form-row">
               <label>Trade:</label>
-              <select
-                name="trade"
-                value={formData.trade}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select Trade</option>
-                {trades.map((trade) => (
-                  <option key={trade} value={trade}>
-                    {trade}
-                  </option>
-                ))}
-              </select>
+              <select name="trade" value={formData.trade} onChange={handleInputChange}>
+                                <option value="">Select Designation</option>
+                                    {trades.map((tra, index) => (
+                                <option key={index} value={tra.trade}>
+                                    {tra.trade}
+                                </option>
+                            ))}
+                            </select>
             </div>
 
             <div className="kindered-form-row">
@@ -158,12 +166,11 @@ const KinderedRoll = () => {
                 onChange={handleInputChange}
                 required
               >
-                <option value="">Select Category</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
+                <option value="">Select </option>
+                                <option value="Non-Ind(Centrally Controlled)">Non-Ind(Centrally Controlled)</option>
+                                <option value="Non-Ind(Unit Controlled)">Non-Ind(Unit Controlled)</option>
+                                <option value="Ind(Unit Controlled)">Ind(Unit Controlled)</option>
+                                <option value="Fire Staff">Fire Staff</option>
               </select>
             </div>
 

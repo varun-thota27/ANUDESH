@@ -22,7 +22,7 @@ const UpdateRegistration = ({onBack}) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/employeesAll/${id}`);
+        const response = await fetch(`const API_URL = ${process.env.REACT_APP_API_URL}/employeesAll/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
@@ -305,7 +305,7 @@ const UpdateRegistration = ({onBack}) => {
         const uidRegex = /^[0-9]{12}$/;
         const basic_payRegex = /^[0-9]+$/;
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const accountNumberRegex = /^[0-9]{12}$/;
+        const accountNumberRegex = /^[0-9]{11,18}$/;
 
         if (!panRegex.test(pan_number)) {
             alert('PAN Number must be 10 alphanumeric characters.');
@@ -328,7 +328,7 @@ const UpdateRegistration = ({onBack}) => {
             return;
         }
         if (!accountNumberRegex.test(bank_account_number)) {
-            alert('Account Number must be 12 digits.');
+            alert('Account Number must be 11 digits.');
             return;
         }
 

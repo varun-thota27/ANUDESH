@@ -222,7 +222,7 @@ const Registration = () => {
         const uidRegex = /^[0-9]{12}$/;
         const basicPayRegex = /^[0-9]+$/;
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const accountNumberRegex = /^[0-9]{11}$/;
+        const accountNumberRegex = /^[0-9]{11,18}$/;
 
         if (!panRegex.test(panNumber)) {
             alert('PAN Number must be 10 alphanumeric characters.');
@@ -245,7 +245,7 @@ const Registration = () => {
             return;
         }
         if (!accountNumberRegex.test(bankAccountNumber)) {
-            alert('Account Number must be 12 digits.');
+            alert('Account Number must be 11 digits.');
             return;
         }
 

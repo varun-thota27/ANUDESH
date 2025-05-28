@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/attendance";
+const API_URL = `${process.env.REACT_APP_API_URL}/attendance`;
 
 const attendanceService = {
   faculties: async () => {

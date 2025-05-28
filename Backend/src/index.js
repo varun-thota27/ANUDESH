@@ -24,7 +24,7 @@ const app = express();
 // ✅ Allow API requests from the frontend running on Apache (port 8080)
 app.use(
   cors({
-    origin: "http://localhost:3001", // Ensure the frontend can communicate
+    origin: process.env.REACT_APP_API_URL, // Ensure the frontend can communicate
     methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true, // Allow cookies and authorization headers
   })
@@ -59,42 +59,17 @@ app.get('/api/login', (req, res) => {
 
 // ✅ Use API Routes
 app.use('/kinderedroll', kinderedRollRoutes);
-console.log("✅ Kindred Roll Routes Loaded");
-
 app.use("/employees", employeeRoutes);
-console.log("✅ Employee Routes Loaded");
-
 app.use("/info", infoRoutes);
-console.log("✅ Info Routes Loaded");
-
 app.use("/attendance", attendanceRoutes);
-console.log("✅ Attendance Routes Loaded");
-
 app.use("/leave", leaveRoutes);
-console.log("✅ Leave Routes Loaded");
-
-// ✅ Fixed duplicate /api/leave-history route (Changed it to leaveHistoryRoutes if needed)
 app.use("/leave-history", leaveRoutes);
-console.log("✅ Leave History Routes Loaded");
-
 app.use("/retire", retire);
-console.log("✅ Retire Routes Loaded");
-
 app.use("/api/auth", authRoutes);
-console.log("✅ Auth Routes Loaded");
-
 app.use("/employeesAll", getEmployeeRoutes);
-console.log("✅ Get Employee Routes Loaded");
-
 app.use('/', signupRoute);
-console.log("✅ Signup Routes Loaded");
-
 app.use('/part2', part2order);
-console.log("✅ Part2 Order Routes Loaded");
-
 app.use("/man-power", manPowerRoutes);
-console.log("✅ Man Power Routes Loaded");
-
 // ✅ Change the server to listen on all interfaces (for XAMPP proxy)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Server running on port ${PORT}`));

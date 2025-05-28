@@ -21,7 +21,7 @@ const generateToken = (user, res) => {
     maxAge: 13 * 60 * 60 * 1000, // 13 hours
   });
 
-  console.log("✅ Token generated successfully.");
+  // console.log("✅ Token generated successfully.");
 };
 
 export const login = async (req, res) => {
@@ -51,7 +51,7 @@ export const login = async (req, res) => {
     }
 
     generateToken(user, res);
-    console.log("✅ Login successful for:", username);
+    // console.log("✅ Login successful for:", username);
     res.json({ message: "Login successful", role: user.role });
 
   } catch (error) {

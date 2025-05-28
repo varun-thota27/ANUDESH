@@ -22,7 +22,7 @@ function App() {
 
   const fetchUserRole = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/login', { 
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, { 
         method: 'GET', 
         credentials: 'include' 
       });
